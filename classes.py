@@ -2,7 +2,9 @@
 import okx.MarketData as Market
 from okx import Account, MarketData, PublicData
 import pandas as pd
+import pandas_ta as ta
 import numpy as np
+import math
 
 import conf
 
@@ -95,7 +97,8 @@ def frame(data):
     df = pd.DataFrame({'Time': t, 'Open': o, 'High': h, 'Low': l, 'Close': c, 'Volume': v})
     df.Time = pd.to_datetime(df.Time, unit='s')
     df.set_index('Time', inplace=True)
-    df.to_csv('df_data.csv')
+    df.sort_index(ascending=True, inplace=True)
+    # df.to_csv('df_data.csv')
     return df
 
 # Получаем общий баланс
@@ -121,4 +124,45 @@ def detect_accumulation(df):
     df['sum_detect'] = sum_detect
     print(df.sum_detect.max())
     df.to_csv('df_data.csv')
+
+"""
+
+Ax = 0
+Ay = (-1)
+Bx = 1
+By = (0)
+AB = корень (1*1 + )
+
+A1-A2
+"""
+
+
+
+
+def _lenght_vektor(df):
+    lenght_v = [0] * len(df)
+    vector_sig = [0] * len(df)
+    for i in range(len(df)):
+        lenght_v[i] = math.sqrt(1 + (abs(df.MACD.iloc[i]) - abs(df.MACD.iloc[i-1])) ** 2)
+        if lenght_v[i] > 1.000_012:
+            vector_sig[i] = 2
+        elif lenght_v[i] > 1.000_009:
+            vector_sig[i] = 1
+    df['lenght_v'] = lenght_v
+    df['vector_sig'] = vector_sig
+    return df
+
+def _chek_signal(df):
+
+    return df
+
+
+
+def add_indicator(df: pd.DataFrame) -> pd.DataFrame:
+    df[['MACD', 'MACDh', 'MACDs']] = ta.macd(close=df.Close, fast=12, slow=26, signal=9)
+    # df['scal'] =
+    df = _lenght_vektor(df=df)
+    df = _chek_signal(df)
+    df.to_csv('df_data.csv')
+    return df
 
