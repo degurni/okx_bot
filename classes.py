@@ -125,35 +125,53 @@ def detect_accumulation(df):
     print(df.sum_detect.max())
     df.to_csv('df_data.csv')
 
-"""
-
-Ax = 0
-Ay = (-1)
-Bx = 1
-By = (0)
-AB = корень (1*1 + )
-
-A1-A2
-"""
 
 
 
-
-def _lenght_vektor(df):
+def _lenght_vektor(df: pd.DataFrame) -> pd.DataFrame:
     lenght_v = [0] * len(df)
     vector_sig = [0] * len(df)
+    # Высчитываем длинну вектора по каждому отрезку индикатора MACD
     for i in range(len(df)):
         lenght_v[i] = math.sqrt(1 + (abs(df.MACD.iloc[i]) - abs(df.MACD.iloc[i-1])) ** 2)
-        if lenght_v[i] > 1.000_012:
-            vector_sig[i] = 2
-        elif lenght_v[i] > 1.000_009:
-            vector_sig[i] = 1
     df['lenght_v'] = lenght_v
+    mn = df.lenght_v.mean()  # Среднее значение векторов
+    k = 1.0000002
+    # Если вектор больше среднего. то скорость тренда индикатора MACD увеличивается
+    for i in range(len(df)):
+        if df.lenght_v[i] > mn * k:
+            vector_sig[i] = 'TRUE'
     df['vector_sig'] = vector_sig
+    print(df.vector_sig.value_counts())
     return df
 
-def _chek_signal(df):
+def _chek_signal(df: pd.DataFrame) -> pd.DataFrame:
+    df = _lenght_vektor(df=df)
+    df = _chek_macd_signal(df=df)
+    sig = [0] * len(df)
+    for i in range(len(df)):
+        if df.vector_sig.iloc[i] == 'TRUE' and df.MACD_sig.iloc[i] == 'SHORT':
+            sig[i] = 'SHORT'
+            print(df.index[i], sig[i])
+        elif df.vector_sig.iloc[i] == 'TRUE' and df.MACD_sig.iloc[i] == 'LONG':
+            sig[i] = 'LONG'
+            print(df.index[i], sig[i])
+    df['SIG'] = sig
+    print(df.SIG.value_counts())
+    return df
 
+    return df
+
+def _chek_macd_signal(df: pd.DataFrame) -> pd.DataFrame:
+    macd_sig = [0] * len(df)
+    for i in range(len(df)):
+        if df.MACD.iloc[i] > 0 and df.MACD.iloc[i-2] < df.MACD.iloc[i-1] > df.MACD.iloc[i]:
+            macd_sig[i] = 'SHORT'
+
+        elif df.MACD.iloc[i] < 0 and df.MACD.iloc[i-2] > df.MACD.iloc[i-1] < df.MACD.iloc[i]:
+           macd_sig[i] = 'LONG'
+    df['MACD_sig'] = macd_sig
+    print(df.MACD_sig.value_counts())
     return df
 
 
@@ -161,7 +179,7 @@ def _chek_signal(df):
 def add_indicator(df: pd.DataFrame) -> pd.DataFrame:
     df[['MACD', 'MACDh', 'MACDs']] = ta.macd(close=df.Close, fast=12, slow=26, signal=9)
     # df['scal'] =
-    df = _lenght_vektor(df=df)
+
     df = _chek_signal(df)
     df.to_csv('df_data.csv')
     return df
