@@ -136,7 +136,7 @@ def _lenght_vektor(df: pd.DataFrame) -> pd.DataFrame:
         lenght_v[i] = math.sqrt(1 + (abs(df.MACD.iloc[i]) - abs(df.MACD.iloc[i-1])) ** 2)
     df['lenght_v'] = lenght_v
     mn = df.lenght_v.mean()  # Среднее значение векторов
-    k = 1.0000002
+    k = 1.000000
     # Если вектор больше среднего. то скорость тренда индикатора MACD увеличивается
     for i in range(len(df)):
         if df.lenght_v[i] > mn * k:
@@ -165,10 +165,10 @@ def _chek_signal(df: pd.DataFrame) -> pd.DataFrame:
 def _chek_macd_signal(df: pd.DataFrame) -> pd.DataFrame:
     macd_sig = [0] * len(df)
     for i in range(len(df)):
-        if df.MACD.iloc[i] > 0 and df.MACD.iloc[i-2] < df.MACD.iloc[i-1] > df.MACD.iloc[i]:
+        if df.MACD.iloc[i] > 0.05 and df.MACD.iloc[i-2] < df.MACD.iloc[i-1] > df.MACD.iloc[i]:
             macd_sig[i] = 'SHORT'
 
-        elif df.MACD.iloc[i] < 0 and df.MACD.iloc[i-2] > df.MACD.iloc[i-1] < df.MACD.iloc[i]:
+        elif df.MACD.iloc[i] < - 0.05 and df.MACD.iloc[i-2] > df.MACD.iloc[i-1] < df.MACD.iloc[i]:
            macd_sig[i] = 'LONG'
     df['MACD_sig'] = macd_sig
     print(df.MACD_sig.value_counts())
@@ -178,7 +178,6 @@ def _chek_macd_signal(df: pd.DataFrame) -> pd.DataFrame:
 
 def add_indicator(df: pd.DataFrame) -> pd.DataFrame:
     df[['MACD', 'MACDh', 'MACDs']] = ta.macd(close=df.Close, fast=12, slow=26, signal=9)
-    # df['scal'] =
 
     df = _chek_signal(df)
     df.to_csv('df_data.csv')
