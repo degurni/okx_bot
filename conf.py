@@ -9,3 +9,7 @@ passw = '#-ffD7GnC*eL9k~'
 
 
 symbols = ['LINK-USDT-SWAP', 'TRB-USDT-SWAP', 'DYDX-USDT-SWAP']
+
+
+
+sleep_1 = 60

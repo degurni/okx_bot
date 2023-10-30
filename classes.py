@@ -128,58 +128,66 @@ def detect_accumulation(df):
 
 
 
-def _lenght_vektor(df: pd.DataFrame) -> pd.DataFrame:
+def _lenght_vektor(df):
     lenght_v = [0] * len(df)
     vector_sig = [0] * len(df)
-    # Высчитываем длинну вектора по каждому отрезку индикатора MACD
     for i in range(len(df)):
         lenght_v[i] = math.sqrt(1 + (abs(df.MACD.iloc[i]) - abs(df.MACD.iloc[i-1])) ** 2)
+        if lenght_v[i] > 1.000_012:
+            vector_sig[i] = 2
+        elif lenght_v[i] > 1.000_009:
+            vector_sig[i] = 1
     df['lenght_v'] = lenght_v
-    mn = df.lenght_v.mean()  # Среднее значение векторов
-    k = 1.000000
-    # Если вектор больше среднего. то скорость тренда индикатора MACD увеличивается
-    for i in range(len(df)):
-        if df.lenght_v[i] > mn * k:
-            vector_sig[i] = 'TRUE'
     df['vector_sig'] = vector_sig
-    print(df.vector_sig.value_counts())
     return df
 
-def _chek_signal(df: pd.DataFrame) -> pd.DataFrame:
-    df = _lenght_vektor(df=df)
-    df = _chek_macd_signal(df=df)
+def _chek_signal(df):
     sig = [0] * len(df)
     for i in range(len(df)):
-        if df.vector_sig.iloc[i] == 'TRUE' and df.MACD_sig.iloc[i] == 'SHORT':
+        if df.CCI_sig.iloc[i] == 'SHORT' and df.MACD_sig.iloc[i] == 'SHORT':
             sig[i] = 'SHORT'
-            print(df.index[i], sig[i])
-        elif df.vector_sig.iloc[i] == 'TRUE' and df.MACD_sig.iloc[i] == 'LONG':
+            # print(df.index[i], sig[i])
+        elif df.CCI_sig.iloc[i] == 'LONG' and df.MACD_sig.iloc[i] == 'LONG':
             sig[i] = 'LONG'
-            print(df.index[i], sig[i])
+            # print(df.index[i], sig[i])
     df['SIG'] = sig
-    print(df.SIG.value_counts())
+    # print(df.SIG.value_counts())
     return df
 
+def _chek_CCI_signal(df: pd.DataFrame) ->pd.DataFrame:
+    predel = 100
+    cci_sig = [0] * len(df)
+    for i in range(len(df)):
+        if df.CCI.iloc[i - 2] > df.CCI.iloc[i - 1] < df.CCI.iloc[i] < -1 * predel:
+            cci_sig[i] = 'LONG'
+        elif df.CCI.iloc[i - 2] < df.CCI.iloc[i - 1] > df.CCI.iloc[i] > predel:
+            cci_sig[i] = 'SHORT'
+    df['CCI_sig'] = cci_sig
+    # print(df.CCI_sig.value_counts())
     return df
 
 def _chek_macd_signal(df: pd.DataFrame) -> pd.DataFrame:
     macd_sig = [0] * len(df)
     for i in range(len(df)):
-        if df.MACD.iloc[i] > 0.05 and df.MACD.iloc[i-2] < df.MACD.iloc[i-1] > df.MACD.iloc[i]:
+        if df.MACD.iloc[i-2] < df.MACD.iloc[i-1] > df.MACD.iloc[i] and df.MACDh.iloc[i -1] > df.MACDh.iloc[i] > 0:
             macd_sig[i] = 'SHORT'
-
-        elif df.MACD.iloc[i] < - 0.05 and df.MACD.iloc[i-2] > df.MACD.iloc[i-1] < df.MACD.iloc[i]:
-           macd_sig[i] = 'LONG'
+        elif df.MACD.iloc[i-2] > df.MACD.iloc[i-1] < df.MACD.iloc[i] and df.MACDh.iloc[i -1] < df.MACDh.iloc[i] < 0:
+            macd_sig[i] = 'LONG'
     df['MACD_sig'] = macd_sig
-    print(df.MACD_sig.value_counts())
+    # print(df.MACD_sig.value_counts())
     return df
+
 
 
 
 def add_indicator(df: pd.DataFrame) -> pd.DataFrame:
     df[['MACD', 'MACDh', 'MACDs']] = ta.macd(close=df.Close, fast=12, slow=26, signal=9)
+    df['CCI'] = ta.cci(high=df.High, low=df.Low, close=df.Close,length=40)
+
+    df = _chek_CCI_signal(df=df)
+    df = _chek_macd_signal(df=df)
 
     df = _chek_signal(df)
-    df.to_csv('df_data.csv')
+    # df.to_csv('df_data.csv')
     return df
 
