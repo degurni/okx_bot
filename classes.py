@@ -1,19 +1,54 @@
 
 import okx.MarketData as Market
-from okx import Account, MarketData, PublicData
+from okx import Account, MarketData, PublicData, Trade
 import pandas as pd
 import pandas_ta as ta
 import numpy as np
 import math
+import os
 
 import conf
+if os.path.isfile('keys.py'):
+    import keys
+    key = keys.key
+    secret = keys.secret
+    passw = keys.passw
+else:
+    key = conf.key
+    secret = conf.secret
+    passw = conf.passw
 
 flag = '0'  # 0 - живая торговля, 1 - тестовая торговля
 public = PublicData.PublicAPI(debug=False)
 market = Market.MarketAPI(flag=flag, debug=False)
-accaunt = Account.AccountAPI(api_key=conf.key, api_secret_key=conf.secret, passphrase=conf.passw,
+accaunt = Account.AccountAPI(api_key=key, api_secret_key=secret, passphrase=passw,
+                             flag=flag, debug=False)
+trade = Trade.TradeAPI(api_key=key, api_secret_key=secret, passphrase=passw,
                              flag=flag, debug=False)
 
+def set_lever(symbol: str, lever: str):
+    """
+    Изменяем плечо
+    :param symbol:       DYDX-USDT-SWAP
+    :param lever:        желаемое плечо
+    :return:
+    """
+    s = accaunt.set_leverage(instId=symbol, lever=lever, mgnMode='cross')
+    return s
+
+def plas_order_and_tp_sl(symbol: str, side: str, size: str, tp: str, sl: str):
+    """
+    Выставляем рыночный ордер и тейкпрофит и стоплосс
+    :param symbol:      ATOM-USDT-SWAP
+    :param side:        buy или sell
+    :param size:        кол-во контрактов
+    :param tp:          цена тейкпрофита
+    :param sl:          цена стоплосса
+    :return:
+    """
+    answer = trade.place_order(instId=symbol, tdMode='cross', side=side, ordType='market',
+                               sz=size, tpTriggerPx=tp, tpOrdPx='-1', slTriggerPx=sl, slOrdPx='-1')
+    return answer['data']
 
 def pairs(type: str='SPOT') -> list:
     """
@@ -124,9 +159,6 @@ def detect_accumulation(df):
     df['sum_detect'] = sum_detect
     print(df.sum_detect.max())
     df.to_csv('df_data.csv')
-
-
-
 
 def _lenght_vektor(df):
     lenght_v = [0] * len(df)
