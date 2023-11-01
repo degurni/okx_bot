@@ -1,3 +1,4 @@
+import json
 
 import okx.MarketData as Market
 from okx import Account, MarketData, PublicData, Trade
@@ -209,9 +210,6 @@ def _chek_macd_signal(df: pd.DataFrame) -> pd.DataFrame:
     # print(df.MACD_sig.value_counts())
     return df
 
-
-
-
 def add_indicator(df: pd.DataFrame) -> pd.DataFrame:
     df[['MACD', 'MACDh', 'MACDs']] = ta.macd(close=df.Close, fast=12, slow=26, signal=9)
     df['CCI'] = ta.cci(high=df.High, low=df.Low, close=df.Close,length=40)
@@ -222,4 +220,12 @@ def add_indicator(df: pd.DataFrame) -> pd.DataFrame:
     df = _chek_signal(df)
     # df.to_csv('df_data.csv')
     return df
+
+def chek_files():
+    if not os.path.isfile('trades.json'):
+        with open('trades.json', 'w') as f:
+            json.dump([], f)
+
+
+
 

@@ -26,6 +26,7 @@ def search():
 
 
 if __name__ == '__main__':
+    classes.chek_files()
     while True:
         search()
         time.sleep(conf.sleep_1)
