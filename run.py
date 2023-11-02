@@ -23,7 +23,7 @@ def search():
             print(f'Получен сигнал --> {symbol}: {df.SIG.iloc[-1]}')
 
 
-# Всё OK
+
 
 
 
@@ -35,15 +35,9 @@ def search():
 
 
 if __name__ == '__main__':
-    try:
-        start()
-
-        while True:
-            search()
-            time.sleep(conf.sleep_1)
-    except KeyboardInterrupt:
-        bot.debug('debug', 'Бот остановлен вручную')
-
-
+    classes.chek_files()
+    while True:
+        search()
+        time.sleep(conf.sleep_1)
 
 
