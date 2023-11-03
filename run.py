@@ -11,7 +11,7 @@ def search():
         df = classes.frame(data=data)
         df = classes.add_indicator(df=df)
         if df.SIG.iloc[-1] != 0:
-            print(f'Получен сигнал --> {symbol}: {df.SIG.iloc[-1]}')
+            print(f'{df.index[-1]}:Получен сигнал --> {symbol}: {df.SIG.iloc[-1]}')
 
 
 
