@@ -23,7 +23,7 @@ def search():
             print(f'Получен сигнал --> {symbol}: {df.SIG.iloc[-1]}')
 
 
-
+# Всё OK
 
 
 
