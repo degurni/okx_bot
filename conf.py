@@ -5,6 +5,8 @@ secret = '5AD20C1E094508003865FAA2B1B18E8D'
 passw = '#-ffD7GnC*eL9k~'
 
 
+debug = 'debug'
+
 symbols = ['LINK-USDT-SWAP', 'TRB-USDT-SWAP', 'DYDX-USDT-SWAP']
 
 
