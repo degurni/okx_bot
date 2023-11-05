@@ -321,10 +321,17 @@ class Bot:
             with open('trades.json', 'w') as f:
                 json.dump([], f)
 
-    def checking_open_positions(self):
+    def checking_open_positions(self, symbol: str = None):
         with open('trades.json', 'r') as f:
-            data = json.loads(f.read())
-        if len(data) == 0:
-            Bot().debug('debug', 'Бот ещё не выставлял ордера, открытых позиций нет')
-        else:
-            Bot().debug('debug', f'Открыто {len(data)} позиций')
+            inf = json.loads(f.read())
+        s = False
+        if symbol and len(inf) != 0:
+            for i in inf:
+                if i['symbol'] == symbol:
+                    s = True
+        elif not symbol:
+            if len(inf) == 0:
+                Bot().debug('debug', 'Бот ещё не выставлял ордера, открытых позиций нет')
+            else:
+                Bot().debug('debug', f'Открыто {len(inf)} позиций')
+        return s

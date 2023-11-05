@@ -16,11 +16,21 @@ def start():
 
 def search():
     for symbol in conf.symbols:
-        data = classes.candles(symbol)
-        df = classes.frame(data=data)
-        df = classes.add_indicator(df=df)
-        if df.SIG.iloc[-1] != 0:
-            print(f'Получен сигнал --> {symbol}: {df.SIG.iloc[-1]}')
+        s = bot.checking_open_positions(symbol=symbol)
+        if s == True:
+            print(f'позиция {symbol} уже открыта')
+
+
+
+        else:
+            data = classes.candles(symbol)
+            df = classes.frame(data=data)
+            df = classes.add_indicator(df=df)
+            if df.SIG.iloc[-1] == 'LONG':
+                print(f'Получен сигнал --> {symbol}: {df.SIG.iloc[-1]}')
+
+            if df.SIG.iloc[-1] == 'SHORT':
+                print(f'Получен сигнал --> {symbol}: {df.SIG.iloc[-1]}')
 
 
 
