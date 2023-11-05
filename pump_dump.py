@@ -5,8 +5,11 @@ import classes
 
 
 
-f = classes.prob()
-print(f)
+f = classes.get_positions()
+print(len(f))
+print(f[0])
+
+
 
 
 
