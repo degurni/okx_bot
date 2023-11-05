@@ -21,19 +21,59 @@ else:
     passw = conf.passw
 
 flag = '0'  # 0 - живая торговля, 1 - тестовая торговля
-public = PublicData.PublicAPI(debug=False)
+public = PublicData.PublicAPI(flag=flag, debug=False)
 market = Market.MarketAPI(flag=flag, debug=False)
 accaunt = Account.AccountAPI(api_key=key, api_secret_key=secret, passphrase=passw,
                              flag=flag, debug=False)
 trade = Trade.TradeAPI(api_key=key, api_secret_key=secret, passphrase=passw,
                              flag=flag, debug=False)
 
-def get_positions():
+# public
+def get_instrument(symbol: str, inst_type: str='SWAP'):
     """
 
-    :return: {'adl': '1',
+    :param symbol:
+    :param inst_type: SPOT, MARGIN, SWAP, FUTURES, OPTION
+    :return:{'alias': '',
+             'baseCcy': '',
+             'category': '1',
+             'ctMult': '1',
+             'ctType': 'linear',
+             'ctVal': '0.1',
+             'ctValCcy': 'TRB',
+             'expTime': '',
+             'instFamily': 'TRB-USDT',
+             'instId': 'TRB-USDT-SWAP',
+             'instType': 'SWAP',
+             'lever': '50',
+             'listTime': '1611916828000',
+             'lotSz': '1',
+             'maxIcebergSz': '100000000.0000000000000000',
+             'maxLmtSz': '100000000',
+             'maxMktSz': '28000',
+             'maxStopSz': '28000',
+             'maxTriggerSz': '100000000.0000000000000000',
+             'maxTwapSz': '100000000.0000000000000000',
+             'minSz': '1',
+             'optType': '',
+             'quoteCcy': '',
+             'settleCcy': 'USDT',
+             'state': 'live',
+             'stk': '',
+             'tickSz': '0.001',
+             'uly': 'TRB-USDT'}
+    """
+    return public.get_instruments(instType=inst_type, instId=symbol)
+
+# accaunt
+
+# Получить открытые позиции
+def get_positions(symbol: str = None):
+    """
+    Получить открытые позиции
+    :return: {'adl': '1',                          уровень делевереджа
               'availPos': '',
-              'avgPx': '102.1168888888888889',
+              'avgPx': '102.1168888888888889',     цена входа
               'baseBal': '',
               'baseBorrowed': '',
               'baseInterest': '',
@@ -45,7 +85,7 @@ def get_positions():
               'closeOrderAlgo': [],
               'deltaBS': '',
               'deltaPA': '',
-              'fee': '-0.05816884',
+              'fee': '-0.05816884',                комиссия
               'fundingFee': '0.0080302563557077',
               'gammaBS': '',
               'gammaPA': '',
@@ -55,7 +95,7 @@ def get_positions():
               'instType': 'SWAP',
               'interest': '',
               'last': '101.228',
-              'lever': '10',
+              'lever': '10',                       плечо
               'liab': '',
               'liabCcy': '',
               'liqPenalty': '0',
@@ -69,9 +109,9 @@ def get_positions():
               'optVal': '',
               'pendingCloseOrdLiabVal': '',
               'pnl': '-0.1889333333333333',
-              'pos': '3',
+              'pos': '3',                          размер позиции
               'posCcy': '',
-              'posId': '637080880187998214',
+              'posId': '637080880187998214',       ID
               'posSide': 'net',
               'quoteBal': '',
               'quoteBorrowed': '',
@@ -94,7 +134,13 @@ def get_positions():
               'vegaPA': ''}
 
     """
-    return accaunt.get_positions(instType='SWAP')['data']
+    if symbol:
+        return accaunt.get_positions(instId=symbol)['data']
+    else:
+        # Если не пердовать название торговой пары то получим только открытые позиции
+        return accaunt.get_positions(instType='SWAP')['data']
+
+
 
 def set_lever(symbol: str, lever: str):
     """

@@ -26,11 +26,11 @@ def search():
             data = classes.candles(symbol)
             df = classes.frame(data=data)
             df = classes.add_indicator(df=df)
-            if df.SIG.iloc[-1] == 'LONG':
-                print(f'Получен сигнал --> {symbol}: {df.SIG.iloc[-1]}')
+            if df.SIG.iloc[-1] != 0:  # 'LONG', 'SHORT'
+                bot.debug('debug', f'Получен сигнал --> {symbol}: {df.SIG.iloc[-1]}')
 
-            if df.SIG.iloc[-1] == 'SHORT':
-                print(f'Получен сигнал --> {symbol}: {df.SIG.iloc[-1]}')
+
+
 
 
 
