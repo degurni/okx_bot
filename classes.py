@@ -6,6 +6,7 @@ import pandas as pd
 import pandas_ta as ta
 import numpy as np
 import math
+import datetime
 import os
 
 import conf
@@ -26,6 +27,74 @@ accaunt = Account.AccountAPI(api_key=key, api_secret_key=secret, passphrase=pass
                              flag=flag, debug=False)
 trade = Trade.TradeAPI(api_key=key, api_secret_key=secret, passphrase=passw,
                              flag=flag, debug=False)
+
+def get_positions():
+    """
+
+    :return: {'adl': '1',
+              'availPos': '',
+              'avgPx': '102.1168888888888889',
+              'baseBal': '',
+              'baseBorrowed': '',
+              'baseInterest': '',
+              'bePx': '102.96527791777321',
+              'bizRefId': '',
+              'bizRefType': '',
+              'cTime': '1698925498071',
+              'ccy': 'USDT',
+              'closeOrderAlgo': [],
+              'deltaBS': '',
+              'deltaPA': '',
+              'fee': '-0.05816884',
+              'fundingFee': '0.0080302563557077',
+              'gammaBS': '',
+              'gammaPA': '',
+              'idxPx': '101.316',
+              'imr': '3.0357000000000003',
+              'instId': 'TRB-USDT-SWAP',
+              'instType': 'SWAP',
+              'interest': '',
+              'last': '101.228',
+              'lever': '10',
+              'liab': '',
+              'liabCcy': '',
+              'liqPenalty': '0',
+              'liqPx': '2.041765621390252',
+              'margin': '',
+              'markPx': '101.19',
+              'mgnMode': 'cross',
+              'mgnRatio': '139.99481419389195',
+              'mmr': '0.1973205',
+              'notionalUsd': '30.361553550000007',
+              'optVal': '',
+              'pendingCloseOrdLiabVal': '',
+              'pnl': '-0.1889333333333333',
+              'pos': '3',
+              'posCcy': '',
+              'posId': '637080880187998214',
+              'posSide': 'net',
+              'quoteBal': '',
+              'quoteBorrowed': '',
+              'quoteInterest': '',
+              'realizedPnl': '-0.2390719169776256',
+              'sId': 0,
+              'spotInUseAmt': '',
+              'spotInUseCcy': '',
+              'thetaBS': '',
+              'thetaPA': '',
+              'tradeId': '131783287',
+              'uTime': '1698954196183',
+              'upl': '-0.278066666666669',
+              'uplLastPx': '-0.26666666666667',
+              'uplRatio': '-0.0907674429738481',
+              'uplRatioLastPx': '-0.0870462171890174',
+              'usdPx': '',
+              'userId': 44786666,
+              'vegaBS': '',
+              'vegaPA': ''}
+
+    """
+    return accaunt.get_positions(instType='SWAP')['data']
 
 def set_lever(symbol: str, lever: str):
     """
@@ -221,11 +290,41 @@ def add_indicator(df: pd.DataFrame) -> pd.DataFrame:
     # df.to_csv('df_data.csv')
     return df
 
-def chek_files():
-    if not os.path.isfile('trades.json'):
-        with open('trades.json', 'w') as f:
-            json.dump([], f)
 
 
+class Bot:
 
+    def _time(self):
+        return datetime.datetime.now().strftime('%H:%M:%S')
 
+    def debug(self, var: str, inf: str) -> None:
+        time = Bot()._time() if var == 'debug' else None
+        if conf.debug == 'inform':
+            if var == 'inform':
+                print(inf)
+            elif var == 'debug':
+                print('\033[32m {} - {} \033[0;0m'.format(time, inf))
+            else:
+                print('\033[31m {} \033[0;0m'.format(inf))
+        if conf.debug == 'debug':
+            if var == 'debug':
+                print('\033[32m {} - {} \033[0;0m'.format(time, inf))
+            else:
+                print('\033[31m {} \033[0;0m'.format(inf))
+        if conf.debug == 'error':
+            if var == 'error':
+                print('\033[31m {} \033[0;0m'.format(inf))
+
+    def chek_files(self):
+        Bot().debug('debug', 'Проверяем наличие вспомогательных файлов')
+        if not os.path.isfile('trades.json'):
+            with open('trades.json', 'w') as f:
+                json.dump([], f)
+
+    def checking_open_positions(self):
+        with open('trades.json', 'r') as f:
+            data = json.loads(f.read())
+        if len(data) == 0:
+            Bot().debug('debug', 'Бот ещё не выставлял ордера, открытых позиций нет')
+        else:
+            Bot().debug('debug', f'Открыто {len(data)} позиций')
