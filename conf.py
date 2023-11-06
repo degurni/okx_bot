@@ -8,6 +8,7 @@ passw = '#-ffD7GnC*eL9k~'
 debug = 'debug'
 
 symbols = ['LINK-USDT-SWAP', 'TRB-USDT-SWAP', 'DYDX-USDT-SWAP']
+lever = 5
 
 
 

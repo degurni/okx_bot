@@ -28,7 +28,7 @@ accaunt = Account.AccountAPI(api_key=key, api_secret_key=secret, passphrase=pass
 trade = Trade.TradeAPI(api_key=key, api_secret_key=secret, passphrase=passw,
                              flag=flag, debug=False)
 
-# public
+# PUBLIC
 def get_instrument(symbol: str, inst_type: str='SWAP'):
     """
 
@@ -65,7 +65,66 @@ def get_instrument(symbol: str, inst_type: str='SWAP'):
     """
     return public.get_instruments(instType=inst_type, instId=symbol)
 
-# accaunt
+
+
+# ACCAUNT
+
+def order_details(symbol: str, ord_id: str):
+    """
+
+    :param symbol:
+    :param ord_id:
+    :return:{'accFillSz': '1',
+             'algoClOrdId': '',
+             'algoId': '',
+             'attachAlgoClOrdId': '',
+             'avgPx': '126.466',
+             'cTime': '1699298365373',
+             'cancelSource': '',
+             'cancelSourceReason': '',
+             'category': 'normal',
+             'ccy': '',
+             'clOrdId': '',
+             'fee': '-0.0063233',
+             'feeCcy': 'USDT',
+             'fillPx': '126.466',
+             'fillSz': '1',
+             'fillTime': '1699298365373',
+             'instId': 'TRB-USDT-SWAP',
+             'instType': 'SWAP',
+             'lever': '10',
+             'ordId': '641839096390262784',
+             'ordType': 'market',
+             'pnl': '0',
+             'posSide': 'net',
+             'px': '',
+             'pxType': '',
+             'pxUsd': '',
+             'pxVol': '',
+             'quickMgnType': '',
+             'rebate': '0',
+             'rebateCcy': 'USDT',
+             'reduceOnly': 'false',
+             'side': 'buy',
+             'slOrdPx': '',
+             'slTriggerPx': '',
+             'slTriggerPxType': '',
+             'source': '',
+             'state': 'filled',
+             'stpId': '',
+             'stpMode': '',
+             'sz': '1',
+             'tag': '',
+             'tdMode': 'cross',
+             'tgtCcy': '',
+             'tpOrdPx': '',
+             'tpTriggerPx': '',
+             'tpTriggerPxType': '',
+             'tradeId': '135788695',
+             'uTime': '1699298365375'}
+
+    """
+    return trade.get_order(instId=symbol, ordId=ord_id)['data'][0]
 
 # Получить открытые позиции
 def get_positions(symbol: str = None):
@@ -141,7 +200,7 @@ def get_positions(symbol: str = None):
         return accaunt.get_positions(instType='SWAP')['data']
 
 
-
+# Изменяем плечо
 def set_lever(symbol: str, lever: str):
     """
     Изменяем плечо
@@ -151,6 +210,36 @@ def set_lever(symbol: str, lever: str):
     """
     s = accaunt.set_leverage(instId=symbol, lever=lever, mgnMode='cross')
     return s
+
+
+
+# TRADE
+
+def amend_order(symbol: str):
+    s = trade.amend_order(instId=symbol, newTpTriggerPx='129.065', newTpOrdPx='-1',
+                          newSlTriggerPx='123.929', newSlOrdPx='-1')
+    return s
+
+def plas_order(symbol: str, side: str, size: str):
+    data = {
+        'instId': symbol,
+        'tdMode': 'cross',
+        'side': side,
+        'ordType': 'market',
+        'sz': size
+    }
+    poz_id = trade.place_order(**data)['data']['ordId']
+    # Запрашиваем информацию об открытой позиции
+    f = get_positions(symbol=symbol)
+    open_price = f[0]['avgPx']
+    fee = f[0]['fee']
+    lever = f[0]['lever']
+    size = f[0]['pos']
+    pos_id = f[0]['posId']
+
+
+
+
 
 def plas_order_and_tp_sl(symbol: str, side: str, size: str, tp: str, sl: str):
     """

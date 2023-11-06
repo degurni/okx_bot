@@ -28,6 +28,8 @@ def search():
             df = classes.add_indicator(df=df)
             if df.SIG.iloc[-1] != 0:  # 'LONG', 'SHORT'
                 bot.debug('debug', f'Получен сигнал --> {symbol}: {df.SIG.iloc[-1]}')
+                # Открываем позицию по маркет-ордеру
+
 
 
 
