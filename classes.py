@@ -32,6 +32,7 @@ class OKXex:
 
     def get_instrument(self, symbol: str | None = None, inst_type: str = 'SPOT') -> list:
         """
+        https://www.okx.com/docs-v5/en/#public-data-rest-api-get-instruments
         Получаем информацию о торговой паре, если не указывать название торговой пары
         то получим о всех торговых парах на рынке
         :param symbol:
@@ -516,7 +517,41 @@ class Bot:
         Bot().debug('debug', 'Проверяем наличие вспомогательных файлов')
         if not os.path.isfile('trades.json'):
             with open('trades.json', 'w') as f:
-                json.dump([], f)
+                json.dump([], f, indent=2)
+
+    def fill_trades_file(self):
+        with open('trades.json', 'r') as f:
+            inf = json.loads(f.read())
+        if len(inf):
+            l = []
+            for i in inf:
+                l.append(i['symbol'])
+            for symbol in conf.symbols:
+                if l.count(symbol) == 0:
+                    s = OKXex().get_instrument(symbol=symbol)[0]
+                    data = {
+                        'symbol': s['instId'],
+                        'base_cur': s['baseCcy'],
+                        'quote_cur': s['quoteCcy'],
+                        'min_size': s['minSz'],
+                        'tick_size': s['tickSz'],
+                        'orders': []
+                    }
+                    inf.append(data)
+        else:
+            for symbol in conf.symbols:
+                s = OKXex().get_instrument(symbol=symbol)[0]
+                data = {
+                    'symbol': s['instId'],
+                    'base_cur': s['baseCcy'],
+                    'quote_cur': s['quoteCcy'],
+                    'min_size': s['minSz'],
+                    'tick_size': s['tickSz'],
+                    'orders': []
+                }
+                inf.append(data)
+        with open('trades.json', 'w') as f:
+            json.dump(inf, f, indent=2)
 
     def checking_open_positions(self, symbol: str = None):
         with open('trades.json', 'r') as f:
