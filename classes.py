@@ -30,6 +30,53 @@ class OKXex:
         self.trade = Trade.TradeAPI(api_key=key, api_secret_key=secret, passphrase=passw,
                            flag=flag, debug=False)
 
+    def get_instrument(self, symbol: str | None = None, inst_type: str = 'SPOT') -> list:
+        """
+        Получаем информацию о торговой паре, если не указывать название торговой пары
+        то получим о всех торговых парах на рынке
+        :param symbol:
+        :param inst_type: SPOT, MARGIN, SWAP, FUTURES, OPTION
+        :return:{'alias': '',
+                 'baseCcy': 'NEAR',
+                 'category': '1',
+                 'ctMult': '',
+                 'ctType': '',
+                 'ctVal': '',
+                 'ctValCcy': '',
+                 'expTime': '',
+                 'instFamily': '',
+                 'instId': 'NEAR-BTC',
+                 'instType': 'SPOT',
+                 'lever': '3',
+                 'listTime': '1606950015000',
+                 'lotSz': '1',
+                 'maxIcebergSz': '9999999999999999.0000000000000000',
+                 'maxLmtAmt': '20000000',
+                 'maxLmtSz': '9999999999999999',
+                 'maxMktAmt': '1000000',
+                 'maxMktSz': '1000000',
+                 'maxStopSz': '1000000',
+                 'maxTriggerSz': '9999999999999999.0000000000000000',
+                 'maxTwapSz': '9999999999999999.0000000000000000',
+                 'minSz': '1',
+                 'optType': '',
+                 'quoteCcy': 'BTC',
+                 'settleCcy': '',
+                 'state': 'live',
+                 'stk': '',
+                 'tickSz': '0.00000001',
+                 'uly': ''}
+
+        """
+        if symbol:
+            res = public.get_instruments(instType=inst_type, instId=symbol)
+        else:
+            res = public.get_instruments(instType=inst_type)
+        if res['code'] == '0':
+            return res['data']
+        else:
+            return res['msg']
+
 
 
 flag = '0'  # 0 - живая торговля, 1 - тестовая торговля
@@ -41,7 +88,7 @@ trade = Trade.TradeAPI(api_key=key, api_secret_key=secret, passphrase=passw,
                              flag=flag, debug=False)
 
 # PUBLIC
-def get_instrument(symbol: str, inst_type: str='SWAP'):
+def get_instrument(symbol: str=None, inst_type: str='SWAP'):
     """
 
     :param symbol:
@@ -75,7 +122,10 @@ def get_instrument(symbol: str, inst_type: str='SWAP'):
              'tickSz': '0.001',
              'uly': 'TRB-USDT'}
     """
-    return public.get_instruments(instType=inst_type, instId=symbol)
+    if symbol:
+        return public.get_instruments(instType=inst_type, instId=symbol)
+    else:
+        return public.get_instruments(instType=inst_type, instId=symbol)
 
 
 
