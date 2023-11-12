@@ -36,6 +36,8 @@ if __name__ == '__main__':
 
     except Exception as e:
         print(e)
+    except KeyboardInterrupt:
+        Bot().debug('debug', 'Бот остановлен вручную')
 
 
 
