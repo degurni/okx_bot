@@ -7,7 +7,9 @@ passw = '#-ffD7GnC*eL9k~'
 
 debug = 'debug'
 
-symbols = ['LINK-USDT-SWAP', 'TRB-USDT-SWAP', 'DYDX-USDT-SWAP']
+symbols = ['LINK-USDT-SWAP', 'TRB-USDT-SWAP', 'DYDX-USDT-SWAP', 'AVAX-USDT-SWAP', 'GAS-USDT-SWAP',
+           'KSM-USDT-SWAP', 'MANA-USDT-SWAP', 'MASK-USDT-SWAP', 'MKR-USDT-SWAP', 'OP-USDT-SWAP',
+           'SNX-USDT-SWAP', 'THETA-USDT-SWAP', 'UNI-USDT-SWAP', 'ZIL-USDT-SWAP']
 lever = 5
 
 

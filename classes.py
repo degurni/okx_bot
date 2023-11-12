@@ -20,6 +20,18 @@ else:
     secret = conf.secret
     passw = conf.passw
 
+class OKXex:
+    flag = '0'  # 0 - живая торговля, 1 - тестовая торговля
+    public = PublicData.PublicAPI(flag=flag, debug=False)
+    def __init__(self):
+        self.market = Market.MarketAPI(flag=flag, debug=False)
+        self.accaunt = Account.AccountAPI(api_key=key, api_secret_key=secret, passphrase=passw,
+                                 flag=flag, debug=False)
+        self.trade = Trade.TradeAPI(api_key=key, api_secret_key=secret, passphrase=passw,
+                           flag=flag, debug=False)
+
+
+
 flag = '0'  # 0 - живая торговля, 1 - тестовая торговля
 public = PublicData.PublicAPI(flag=flag, debug=False)
 market = Market.MarketAPI(flag=flag, debug=False)
