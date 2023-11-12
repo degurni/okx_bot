@@ -1,3 +1,6 @@
+import json
+import time
+
 import conf
 from classes import OKXex, Bot
 
@@ -9,7 +12,14 @@ def start():
     Bot().fill_trades_file()
 
 def trades_bot():
-    pass
+    with open('trades.json', 'r') as f:
+        infa = json.loads(f.read())
+    for symbol in conf.symbols:
+        for inf in infa:
+            if symbol == inf['symbol']:
+                if len(inf['orders']) == 0:
+                    Bot().zero_orders(inf=inf)
+
 
 
 
@@ -29,15 +39,24 @@ def trades_bot():
 
 
 if __name__ == '__main__':
-    try:
-        start()
-        while True:
-            trades_bot()
 
-    except Exception as e:
-        print(e)
-    except KeyboardInterrupt:
-        Bot().debug('debug', 'Бот остановлен вручную')
+    start()
+    while True:
+        trades_bot()
+        time.sleep(conf.sleep_1)
+
+
+
+    # try:
+    #     start()
+    #     while True:
+    #         trades_bot()
+    #         time.sleep(conf.sleep_1)
+    #
+    # except Exception as e:
+    #     print(e)
+    # except KeyboardInterrupt:
+    #     Bot().debug('debug', 'Бот остановлен вручную')
 
 
 

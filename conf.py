@@ -73,6 +73,7 @@ SPOT:
 debug = 'debug'
 
 symbols = ['LUNC-USDT', 'NEAR-USDT']
+tf = '15m'
 
 # symbols = ['LINK-USDT-SWAP', 'TRB-USDT-SWAP', 'DYDX-USDT-SWAP', 'AVAX-USDT-SWAP', 'GAS-USDT-SWAP',
 #            'KSM-USDT-SWAP', 'MANA-USDT-SWAP', 'MASK-USDT-SWAP', 'MKR-USDT-SWAP', 'OP-USDT-SWAP',

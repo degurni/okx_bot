@@ -30,6 +30,32 @@ class OKXex:
         self.trade = Trade.TradeAPI(api_key=key, api_secret_key=secret, passphrase=passw,
                            flag=flag, debug=False)
 
+    # MARKET
+    def candles(self, pair: str = 'BTC-USDT', tf: str = '15m', limit: str = '300') -> list:
+        """
+        Получить сведения о 300 последних рыночных свечах
+        :param instId:
+        :param bar:
+        :param limit:
+        :return:['1697125500000',           -Время
+                 '26668.4',                 -Открытие
+                 '26697.9',                 -Максимум
+                 '26605',                   -Минимум
+                 '26677.2',                 -Закрытие
+                 '6000603.65197306',
+                 '159971120351.05124191',
+                 '159971120351.05124191',
+                 '0']                       -1 - завершена. 0 - не завершена
+        """
+        res = self.market.get_candlesticks(instId=pair, bar=tf, limit=limit)
+        if res['code'] == '0' and res['msg'] == '':
+            # print(res['data'])
+            return res['data']
+        else:
+            print(f'code - {res["code"]} : msg - {res["msg"]}')
+            return []
+
+    # PUBLIC
     def get_instrument(self, symbol: str | None = None, inst_type: str = 'SPOT') -> list:
         """
         https://www.okx.com/docs-v5/en/#public-data-rest-api-get-instruments
@@ -70,13 +96,14 @@ class OKXex:
 
         """
         if symbol:
-            res = public.get_instruments(instType=inst_type, instId=symbol)
+            res = self.public.get_instruments(instType=inst_type, instId=symbol)
         else:
-            res = public.get_instruments(instType=inst_type)
+            res = self.public.get_instruments(instType=inst_type)
         if res['code'] == '0':
             return res['data']
         else:
             return res['msg']
+
 
 
 
@@ -88,7 +115,7 @@ accaunt = Account.AccountAPI(api_key=key, api_secret_key=secret, passphrase=pass
 trade = Trade.TradeAPI(api_key=key, api_secret_key=secret, passphrase=passw,
                              flag=flag, debug=False)
 
-# PUBLIC
+
 def get_instrument(symbol: str=None, inst_type: str='SWAP'):
     """
 
@@ -382,27 +409,7 @@ def candles(pair: str='BTC-USDT', tf: str='15m', limit: str='300') -> list:
         print(f'code - {res["code"]} : msg - {res["msg"]}')
         return []
 
-# Преобразовываем данные о свечах в датафрейм
-def frame(data):
-    t = []
-    o = []
-    h = []
-    l = []
-    c = []
-    v = []
-    for i in data:
-        t.append(int(i[0]) / 1000)
-        o.append(float(i[1]))
-        h.append(float(i[2]))
-        l.append(float(i[3]))
-        c.append(float(i[4]))
-        v.append(float(i[5]))
-    df = pd.DataFrame({'Time': t, 'Open': o, 'High': h, 'Low': l, 'Close': c, 'Volume': v})
-    df.Time = pd.to_datetime(df.Time, unit='s')
-    df.set_index('Time', inplace=True)
-    df.sort_index(ascending=True, inplace=True)
-    # df.to_csv('df_data.csv')
-    return df
+
 
 # Получаем общий баланс
 def balance():
@@ -477,16 +484,7 @@ def _chek_macd_signal(df: pd.DataFrame) -> pd.DataFrame:
     # print(df.MACD_sig.value_counts())
     return df
 
-def add_indicator(df: pd.DataFrame) -> pd.DataFrame:
-    df[['MACD', 'MACDh', 'MACDs']] = ta.macd(close=df.Close, fast=12, slow=26, signal=9)
-    df['CCI'] = ta.cci(high=df.High, low=df.Low, close=df.Close,length=40)
 
-    df = _chek_CCI_signal(df=df)
-    df = _chek_macd_signal(df=df)
-
-    df = _chek_signal(df)
-    # df.to_csv('df_data.csv')
-    return df
 
 
 
@@ -567,3 +565,82 @@ class Bot:
             else:
                 Bot().debug('debug', f'Открыто {len(inf)} позиций')
         return s
+
+    def _chek_signal(self, df):
+        sig = [0] * len(df)
+        for i in range(len(df)):
+            if df.CCI_sig.iloc[i] == 'SHORT' and df.MACD_sig.iloc[i] == 'SHORT':
+                sig[i] = 'SHORT'
+                # print(df.index[i], sig[i])
+            elif df.CCI_sig.iloc[i] == 'LONG' and df.MACD_sig.iloc[i] == 'LONG':
+                sig[i] = 'LONG'
+                # print(df.index[i], sig[i])
+        df['SIG'] = sig
+        # print(df.SIG.value_counts())
+        return df
+
+    def _chek_CCI_signal(self, df: pd.DataFrame) -> pd.DataFrame:
+        predel = 100
+        cci_sig = [0] * len(df)
+        for i in range(len(df)):
+            if df.CCI.iloc[i - 2] > df.CCI.iloc[i - 1] < df.CCI.iloc[i] < -1 * predel:
+                cci_sig[i] = 'LONG'
+            elif df.CCI.iloc[i - 2] < df.CCI.iloc[i - 1] > df.CCI.iloc[i] > predel:
+                cci_sig[i] = 'SHORT'
+        df['CCI_sig'] = cci_sig
+        # print(df.CCI_sig.value_counts())
+        return df
+
+    def _chek_macd_signal(self, df: pd.DataFrame) -> pd.DataFrame:
+        macd_sig = [0] * len(df)
+        for i in range(len(df)):
+            if df.MACD.iloc[i - 2] < df.MACD.iloc[i - 1] > df.MACD.iloc[i] and df.MACDh.iloc[i - 1] > df.MACDh.iloc[
+                i] > 0:
+                macd_sig[i] = 'SHORT'
+            elif df.MACD.iloc[i - 2] > df.MACD.iloc[i - 1] < df.MACD.iloc[i] and df.MACDh.iloc[i - 1] < df.MACDh.iloc[
+                i] < 0:
+                macd_sig[i] = 'LONG'
+        df['MACD_sig'] = macd_sig
+        # print(df.MACD_sig.value_counts())
+        return df
+
+    def add_indicator(self, df: pd.DataFrame) -> pd.DataFrame:
+        df[['MACD', 'MACDh', 'MACDs']] = ta.macd(close=df.Close, fast=12, slow=26, signal=9)
+        df['CCI'] = ta.cci(high=df.High, low=df.Low, close=df.Close, length=40)
+
+        df = Bot()._chek_CCI_signal(df=df)
+        df = Bot()._chek_macd_signal(df=df)
+
+        df = Bot()._chek_signal(df)
+        # df.to_csv('df_data.csv')
+        return df
+
+    # Преобразовываем данные о свечах в датафрейм
+    def frame(self, data):
+        t = []
+        o = []
+        h = []
+        l = []
+        c = []
+        v = []
+        for i in data:
+            t.append(int(i[0]) / 1000)
+            o.append(float(i[1]))
+            h.append(float(i[2]))
+            l.append(float(i[3]))
+            c.append(float(i[4]))
+            v.append(float(i[5]))
+        df = pd.DataFrame({'Time': t, 'Open': o, 'High': h, 'Low': l, 'Close': c, 'Volume': v})
+        df.Time = pd.to_datetime(df.Time, unit='s')
+        df.set_index('Time', inplace=True)
+        df.sort_index(ascending=True, inplace=True)
+        # df.to_csv('df_data.csv')
+        return df
+
+    def zero_orders(self, inf: dict):
+        if len(inf['orders']) == 0:
+            Bot().debug('debug', f'По торговой паре {inf["symbol"]} ордера не выставлялись')
+            f = OKXex().candles(pair=inf['symbol'], tf=conf.tf)
+            df = Bot().frame(data=f)
+            df = Bot().add_indicator(df)
+            df.to_csv(f'df_data_{inf["symbol"]}.csv')
