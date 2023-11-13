@@ -4,6 +4,7 @@ import okx.MarketData as Market
 from okx import Account, MarketData, PublicData, Trade
 import pandas as pd
 import pandas_ta as ta
+from sklearn import preprocessing
 import numpy as np
 import math
 import datetime
@@ -569,43 +570,47 @@ class Bot:
     def _chek_signal(self, df):
         sig = [0] * len(df)
         for i in range(len(df)):
-            if df.CCI_sig.iloc[i] == 'SHORT' and df.MACD_sig.iloc[i] == 'SHORT':
-                sig[i] = 'SHORT'
+            if df.CCI_sig.iloc[i] == 'sell' and df.MACD_sig.iloc[i] == 'sell':
+                sig[i] = 'sell'
                 # print(df.index[i], sig[i])
-            elif df.CCI_sig.iloc[i] == 'LONG' and df.MACD_sig.iloc[i] == 'LONG':
-                sig[i] = 'LONG'
+            elif df.CCI_sig.iloc[i] == 'buy' and df.MACD_sig.iloc[i] == 'buy':
+                sig[i] = 'buy'
                 # print(df.index[i], sig[i])
         df['SIG'] = sig
         # print(df.SIG.value_counts())
         return df
 
     def _chek_CCI_signal(self, df: pd.DataFrame) -> pd.DataFrame:
-        predel = 100
+        predel = 90
         cci_sig = [0] * len(df)
         for i in range(len(df)):
-            if df.CCI.iloc[i - 2] > df.CCI.iloc[i - 1] < df.CCI.iloc[i] < -1 * predel:
-                cci_sig[i] = 'LONG'
-            elif df.CCI.iloc[i - 2] < df.CCI.iloc[i - 1] > df.CCI.iloc[i] > predel:
-                cci_sig[i] = 'SHORT'
+            if df.CCI.iloc[i] > predel and df.CCI.iloc[i] < df.CCI.iloc[i - 1]:
+                cci_sig[i] = 'sell'
+            elif df.CCI.iloc[i] < -1 * predel and df.CCI.iloc[i] > df.CCI.iloc[i - 1]:
+                cci_sig[i] = 'buy'
         df['CCI_sig'] = cci_sig
         # print(df.CCI_sig.value_counts())
         return df
 
     def _chek_macd_signal(self, df: pd.DataFrame) -> pd.DataFrame:
+        predel = 0.3
         macd_sig = [0] * len(df)
         for i in range(len(df)):
-            if df.MACD.iloc[i - 2] < df.MACD.iloc[i - 1] > df.MACD.iloc[i] and df.MACDh.iloc[i - 1] > df.MACDh.iloc[
-                i] > 0:
-                macd_sig[i] = 'SHORT'
-            elif df.MACD.iloc[i - 2] > df.MACD.iloc[i - 1] < df.MACD.iloc[i] and df.MACDh.iloc[i - 1] < df.MACDh.iloc[
-                i] < 0:
-                macd_sig[i] = 'LONG'
+            if df.MACDh.iloc[i] > predel and df.MACDh.iloc[i] < df.MACDh.iloc[i - 1]:
+                macd_sig[i] = 'sell'
+            elif df.MACDh.iloc[i] < -1 * predel and df.MACDh.iloc[i] > df.MACDh.iloc[i - 1]:
+                macd_sig[i] = 'buy'
         df['MACD_sig'] = macd_sig
         # print(df.MACD_sig.value_counts())
         return df
 
     def add_indicator(self, df: pd.DataFrame) -> pd.DataFrame:
         df[['MACD', 'MACDh', 'MACDs']] = ta.macd(close=df.Close, fast=12, slow=26, signal=9)
+        scaler = preprocessing.MinMaxScaler(feature_range=(-1, 1))
+        df['MACD'] = scaler.fit_transform(df[['MACD']])
+        df['MACDh'] = scaler.fit_transform(df[['MACDh']])
+        df['MACDs'] = scaler.fit_transform(df[['MACDs']])
+
         df['CCI'] = ta.cci(high=df.High, low=df.Low, close=df.Close, length=40)
 
         df = Bot()._chek_CCI_signal(df=df)
