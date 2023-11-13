@@ -386,29 +386,6 @@ def pairs(type: str='SPOT') -> list:
         pairs.append(i['instId'])
     return pairs
 
-def candles(pair: str='BTC-USDT', tf: str='15m', limit: str='300') -> list:
-    """
-    Получить сведения о 300 последних рыночных свечах
-    :param instId:
-    :param bar:
-    :param limit:
-    :return:['1697125500000',           -Время
-             '26668.4',                 -Открытие
-             '26697.9',                 -Максимум
-             '26605',                   -Минимум
-             '26677.2',                 -Закрытие
-             '6000603.65197306',
-             '159971120351.05124191',
-             '159971120351.05124191',
-             '0']                       -1 - завершена. 0 - не завершена
-    """
-    res = market.get_candlesticks(instId=pair, bar=tf, limit=limit)
-    if res['code'] == '0' and res['msg'] == '':
-        # print(res['data'])
-        return res['data']
-    else:
-        print(f'code - {res["code"]} : msg - {res["msg"]}')
-        return []
 
 
 
