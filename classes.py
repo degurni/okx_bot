@@ -621,7 +621,8 @@ class Bot:
         return df
 
     # Преобразовываем данные о свечах в датафрейм
-    def frame(self, data):
+    def frame(self, symbol):
+        data = OKXex().candles(pair=symbol, tf=conf.tf)
         t = []
         o = []
         h = []
@@ -645,7 +646,11 @@ class Bot:
     def zero_orders(self, inf: dict):
         if len(inf['orders']) == 0:
             Bot().debug('debug', f'По торговой паре {inf["symbol"]} ордера не выставлялись')
-            f = OKXex().candles(pair=inf['symbol'], tf=conf.tf)
-            df = Bot().frame(data=f)
+            df = Bot().frame(symbol=inf['symbol'])
             df = Bot().add_indicator(df)
             df.to_csv(f'df_data_{inf["symbol"]}.csv')
+            if df.SIG.iloc[-1] == 'buy':
+                Bot().debug('debug', f'{inf["symbol"]}: Выставляем маркет ордер на покупку')
+        else:
+            Bot().debug('debug', f'{inf["symbol"]}: Проверяем последний выставленный ордер')
+
