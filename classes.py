@@ -22,9 +22,10 @@ else:
     passw = conf.passw
 
 class OKXex:
-    flag = '0'  # 0 - живая торговля, 1 - тестовая торговля
-    public = PublicData.PublicAPI(flag=flag, debug=False)
+
     def __init__(self):
+        flag = '0'  # 0 - живая торговля, 1 - тестовая торговля
+        self.public = PublicData.PublicAPI(flag=flag, debug=False)
         self.market = Market.MarketAPI(flag=flag, debug=False)
         self.accaunt = Account.AccountAPI(api_key=key, api_secret_key=secret, passphrase=passw,
                                  flag=flag, debug=False)
@@ -105,294 +106,254 @@ class OKXex:
         else:
             return res['msg']
 
+    # ACCAUNT
+    # Получаем баланс
+    def get_balance(self, currency: str = None):
+        if currency:
+            res = self.accaunt.get_account_balance(ccy=currency)
+        else:
+            res = self.accaunt.get_account_balance()
+        return res['data'][0]['details']
 
-
-
-flag = '0'  # 0 - живая торговля, 1 - тестовая торговля
-public = PublicData.PublicAPI(flag=flag, debug=False)
-market = Market.MarketAPI(flag=flag, debug=False)
-accaunt = Account.AccountAPI(api_key=key, api_secret_key=secret, passphrase=passw,
-                             flag=flag, debug=False)
-trade = Trade.TradeAPI(api_key=key, api_secret_key=secret, passphrase=passw,
-                             flag=flag, debug=False)
-
-
-def get_instrument(symbol: str=None, inst_type: str='SWAP'):
-    """
-
-    :param symbol:
-    :param inst_type: SPOT, MARGIN, SWAP, FUTURES, OPTION
-    :return:{'alias': '',
-             'baseCcy': '',
-             'category': '1',
-             'ctMult': '1',
-             'ctType': 'linear',
-             'ctVal': '0.1',
-             'ctValCcy': 'TRB',
-             'expTime': '',
-             'instFamily': 'TRB-USDT',
-             'instId': 'TRB-USDT-SWAP',
-             'instType': 'SWAP',
-             'lever': '50',
-             'listTime': '1611916828000',
-             'lotSz': '1',
-             'maxIcebergSz': '100000000.0000000000000000',
-             'maxLmtSz': '100000000',
-             'maxMktSz': '28000',
-             'maxStopSz': '28000',
-             'maxTriggerSz': '100000000.0000000000000000',
-             'maxTwapSz': '100000000.0000000000000000',
-             'minSz': '1',
-             'optType': '',
-             'quoteCcy': '',
-             'settleCcy': 'USDT',
-             'state': 'live',
-             'stk': '',
-             'tickSz': '0.001',
-             'uly': 'TRB-USDT'}
-    """
-    if symbol:
-        return public.get_instruments(instType=inst_type, instId=symbol)
-    else:
-        return public.get_instruments(instType=inst_type, instId=symbol)
-
-
-
-# ACCAUNT
-
-def order_details(symbol: str, ord_id: str):
-    """
-
-    :param symbol:
-    :param ord_id:
-    :return:{'accFillSz': '1',
-             'algoClOrdId': '',
-             'algoId': '',
-             'attachAlgoClOrdId': '',
-             'avgPx': '126.466',
-             'cTime': '1699298365373',
-             'cancelSource': '',
-             'cancelSourceReason': '',
-             'category': 'normal',
-             'ccy': '',
-             'clOrdId': '',
-             'fee': '-0.0063233',
-             'feeCcy': 'USDT',
-             'fillPx': '126.466',
-             'fillSz': '1',
-             'fillTime': '1699298365373',
-             'instId': 'TRB-USDT-SWAP',
-             'instType': 'SWAP',
-             'lever': '10',
-             'ordId': '641839096390262784',
-             'ordType': 'market',
-             'pnl': '0',
-             'posSide': 'net',
-             'px': '',
-             'pxType': '',
-             'pxUsd': '',
-             'pxVol': '',
-             'quickMgnType': '',
-             'rebate': '0',
-             'rebateCcy': 'USDT',
-             'reduceOnly': 'false',
-             'side': 'buy',
-             'slOrdPx': '',
-             'slTriggerPx': '',
-             'slTriggerPxType': '',
-             'source': '',
-             'state': 'filled',
-             'stpId': '',
-             'stpMode': '',
-             'sz': '1',
-             'tag': '',
-             'tdMode': 'cross',
-             'tgtCcy': '',
-             'tpOrdPx': '',
-             'tpTriggerPx': '',
-             'tpTriggerPxType': '',
-             'tradeId': '135788695',
-             'uTime': '1699298365375'}
-
-    """
-    return trade.get_order(instId=symbol, ordId=ord_id)['data'][0]
-
-# Получить открытые позиции
-def get_positions(symbol: str = None):
-    """
-    Получить открытые позиции
-    :return: {'adl': '1',                          уровень делевереджа
-              'availPos': '',
-              'avgPx': '102.1168888888888889',     цена входа
-              'baseBal': '',
-              'baseBorrowed': '',
-              'baseInterest': '',
-              'bePx': '102.96527791777321',
-              'bizRefId': '',
-              'bizRefType': '',
-              'cTime': '1698925498071',
-              'ccy': 'USDT',
-              'closeOrderAlgo': [],
-              'deltaBS': '',
-              'deltaPA': '',
-              'fee': '-0.05816884',                комиссия
-              'fundingFee': '0.0080302563557077',
-              'gammaBS': '',
-              'gammaPA': '',
-              'idxPx': '101.316',
-              'imr': '3.0357000000000003',
-              'instId': 'TRB-USDT-SWAP',
-              'instType': 'SWAP',
-              'interest': '',
-              'last': '101.228',
-              'lever': '10',                       плечо
-              'liab': '',
-              'liabCcy': '',
-              'liqPenalty': '0',
-              'liqPx': '2.041765621390252',
-              'margin': '',
-              'markPx': '101.19',
-              'mgnMode': 'cross',
-              'mgnRatio': '139.99481419389195',
-              'mmr': '0.1973205',
-              'notionalUsd': '30.361553550000007',
-              'optVal': '',
-              'pendingCloseOrdLiabVal': '',
-              'pnl': '-0.1889333333333333',
-              'pos': '3',                          размер позиции
-              'posCcy': '',
-              'posId': '637080880187998214',       ID
-              'posSide': 'net',
-              'quoteBal': '',
-              'quoteBorrowed': '',
-              'quoteInterest': '',
-              'realizedPnl': '-0.2390719169776256',
-              'sId': 0,
-              'spotInUseAmt': '',
-              'spotInUseCcy': '',
-              'thetaBS': '',
-              'thetaPA': '',
-              'tradeId': '131783287',
-              'uTime': '1698954196183',
-              'upl': '-0.278066666666669',
-              'uplLastPx': '-0.26666666666667',
-              'uplRatio': '-0.0907674429738481',
-              'uplRatioLastPx': '-0.0870462171890174',
-              'usdPx': '',
-              'userId': 44786666,
-              'vegaBS': '',
-              'vegaPA': ''}
-
-    """
-    if symbol:
-        return accaunt.get_positions(instId=symbol)['data']
-    else:
-        # Если не пердовать название торговой пары то получим только открытые позиции
-        return accaunt.get_positions(instType='SWAP')['data']
-
-
-# Изменяем плечо
-def set_lever(symbol: str, lever: str):
-    """
-    Изменяем плечо
-    :param symbol:       DYDX-USDT-SWAP
-    :param lever:        желаемое плечо
-    :return:
-    """
-    s = accaunt.set_leverage(instId=symbol, lever=lever, mgnMode='cross')
-    return s
-
-
-
-# TRADE
-
-def amend_order(symbol: str):
-    s = trade.amend_order(instId=symbol, newTpTriggerPx='129.065', newTpOrdPx='-1',
-                          newSlTriggerPx='123.929', newSlOrdPx='-1')
-    return s
-
-def plas_order(symbol: str, side: str, size: str):
-    data = {
-        'instId': symbol,
-        'tdMode': 'cross',
-        'side': side,
-        'ordType': 'market',
-        'sz': size
-    }
-    poz_id = trade.place_order(**data)['data']['ordId']
-    # Запрашиваем информацию об открытой позиции
-    f = get_positions(symbol=symbol)
-    open_price = f[0]['avgPx']
-    fee = f[0]['fee']
-    lever = f[0]['lever']
-    size = f[0]['pos']
-    pos_id = f[0]['posId']
+    # TRADE
+    def place_order(self, data):
+        f = self.trade.place_order(**data)
+        print(f)
 
 
 
 
+#
+# def order_details(symbol: str, ord_id: str):
+#     """
+#
+#     :param symbol:
+#     :param ord_id:
+#     :return:{'accFillSz': '1',
+#              'algoClOrdId': '',
+#              'algoId': '',
+#              'attachAlgoClOrdId': '',
+#              'avgPx': '126.466',
+#              'cTime': '1699298365373',
+#              'cancelSource': '',
+#              'cancelSourceReason': '',
+#              'category': 'normal',
+#              'ccy': '',
+#              'clOrdId': '',
+#              'fee': '-0.0063233',
+#              'feeCcy': 'USDT',
+#              'fillPx': '126.466',
+#              'fillSz': '1',
+#              'fillTime': '1699298365373',
+#              'instId': 'TRB-USDT-SWAP',
+#              'instType': 'SWAP',
+#              'lever': '10',
+#              'ordId': '641839096390262784',
+#              'ordType': 'market',
+#              'pnl': '0',
+#              'posSide': 'net',
+#              'px': '',
+#              'pxType': '',
+#              'pxUsd': '',
+#              'pxVol': '',
+#              'quickMgnType': '',
+#              'rebate': '0',
+#              'rebateCcy': 'USDT',
+#              'reduceOnly': 'false',
+#              'side': 'buy',
+#              'slOrdPx': '',
+#              'slTriggerPx': '',
+#              'slTriggerPxType': '',
+#              'source': '',
+#              'state': 'filled',
+#              'stpId': '',
+#              'stpMode': '',
+#              'sz': '1',
+#              'tag': '',
+#              'tdMode': 'cross',
+#              'tgtCcy': '',
+#              'tpOrdPx': '',
+#              'tpTriggerPx': '',
+#              'tpTriggerPxType': '',
+#              'tradeId': '135788695',
+#              'uTime': '1699298365375'}
+#
+#     """
+#     return trade.get_order(instId=symbol, ordId=ord_id)['data'][0]
+#
+# # Получить открытые позиции
+# def get_positions(symbol: str = None):
+#     """
+#     Получить открытые позиции
+#     :return: {'adl': '1',                          уровень делевереджа
+#               'availPos': '',
+#               'avgPx': '102.1168888888888889',     цена входа
+#               'baseBal': '',
+#               'baseBorrowed': '',
+#               'baseInterest': '',
+#               'bePx': '102.96527791777321',
+#               'bizRefId': '',
+#               'bizRefType': '',
+#               'cTime': '1698925498071',
+#               'ccy': 'USDT',
+#               'closeOrderAlgo': [],
+#               'deltaBS': '',
+#               'deltaPA': '',
+#               'fee': '-0.05816884',                комиссия
+#               'fundingFee': '0.0080302563557077',
+#               'gammaBS': '',
+#               'gammaPA': '',
+#               'idxPx': '101.316',
+#               'imr': '3.0357000000000003',
+#               'instId': 'TRB-USDT-SWAP',
+#               'instType': 'SWAP',
+#               'interest': '',
+#               'last': '101.228',
+#               'lever': '10',                       плечо
+#               'liab': '',
+#               'liabCcy': '',
+#               'liqPenalty': '0',
+#               'liqPx': '2.041765621390252',
+#               'margin': '',
+#               'markPx': '101.19',
+#               'mgnMode': 'cross',
+#               'mgnRatio': '139.99481419389195',
+#               'mmr': '0.1973205',
+#               'notionalUsd': '30.361553550000007',
+#               'optVal': '',
+#               'pendingCloseOrdLiabVal': '',
+#               'pnl': '-0.1889333333333333',
+#               'pos': '3',                          размер позиции
+#               'posCcy': '',
+#               'posId': '637080880187998214',       ID
+#               'posSide': 'net',
+#               'quoteBal': '',
+#               'quoteBorrowed': '',
+#               'quoteInterest': '',
+#               'realizedPnl': '-0.2390719169776256',
+#               'sId': 0,
+#               'spotInUseAmt': '',
+#               'spotInUseCcy': '',
+#               'thetaBS': '',
+#               'thetaPA': '',
+#               'tradeId': '131783287',
+#               'uTime': '1698954196183',
+#               'upl': '-0.278066666666669',
+#               'uplLastPx': '-0.26666666666667',
+#               'uplRatio': '-0.0907674429738481',
+#               'uplRatioLastPx': '-0.0870462171890174',
+#               'usdPx': '',
+#               'userId': 44786666,
+#               'vegaBS': '',
+#               'vegaPA': ''}
+#
+#     """
+#     if symbol:
+#         return accaunt.get_positions(instId=symbol)['data']
+#     else:
+#         # Если не пердовать название торговой пары то получим только открытые позиции
+#         return accaunt.get_positions(instType='SWAP')['data']
+#
+#
+# # Изменяем плечо
+# def set_lever(symbol: str, lever: str):
+#     """
+#     Изменяем плечо
+#     :param symbol:       DYDX-USDT-SWAP
+#     :param lever:        желаемое плечо
+#     :return:
+#     """
+#     s = accaunt.set_leverage(instId=symbol, lever=lever, mgnMode='cross')
+#     return s
+#
+#
+#
+#
+#
+# def amend_order(symbol: str):
+#     s = trade.amend_order(instId=symbol, newTpTriggerPx='129.065', newTpOrdPx='-1',
+#                           newSlTriggerPx='123.929', newSlOrdPx='-1')
+#     return s
+#
+# def plas_order(symbol: str, side: str, size: str):
+#     data = {
+#         'instId': symbol,
+#         'tdMode': 'cross',
+#         'side': side,
+#         'ordType': 'market',
+#         'sz': size
+#     }
+#     poz_id = trade.place_order(**data)['data']['ordId']
+#     # Запрашиваем информацию об открытой позиции
+#     f = get_positions(symbol=symbol)
+#     open_price = f[0]['avgPx']
+#     fee = f[0]['fee']
+#     lever = f[0]['lever']
+#     size = f[0]['pos']
+#     pos_id = f[0]['posId']
+#
+#
+#
+#
+#
+# def plas_order_and_tp_sl(symbol: str, side: str, size: str, tp: str, sl: str):
+#     """
+#     Выставляем рыночный ордер и тейкпрофит и стоплосс
+#     :param symbol:      ATOM-USDT-SWAP
+#     :param side:        buy или sell
+#     :param size:        кол-во контрактов
+#     :param tp:          цена тейкпрофита
+#     :param sl:          цена стоплосса
+#     :return:
+#     """
+#     answer = trade.place_order(instId=symbol, tdMode='cross', side=side, ordType='market',
+#                                sz=size, tpTriggerPx=tp, tpOrdPx='-1', slTriggerPx=sl, slOrdPx='-1')
+#     return answer['data']
+#
+# def pairs(type: str='SPOT') -> list:
+#     """
+#
+#     :param type:
+#     :return: {'alias': '',
+#               'baseCcy': 'FTM',
+#               'category': '1',
+#               'ctMult': '',
+#               'ctType': '',
+#               'ctVal': '',
+#               'ctValCcy': '',
+#               'expTime': '',
+#               'instFamily': '',
+#               'instId': 'FTM-OKB',
+#               'instType': 'SPOT',
+#               'lever': '',
+#               'listTime': '1635155926000',
+#               'lotSz': '0.000001',
+#               'maxIcebergSz': '999999999999.0000000000000000',
+#               'maxLmtSz': '999999999999',
+#               'maxMktSz': '1000000',
+#               'maxStopSz': '1000000',
+#               'maxTriggerSz': '999999999999.0000000000000000',
+#               'maxTwapSz': '999999999999.0000000000000000',
+#               'minSz': '1',
+#               'optType': '',
+#               'quoteCcy': 'OKB',
+#               'settleCcy': '',
+#               'state': 'live',
+#               'stk': '',
+#               'tickSz': '0.00001',
+#               'uly': ''}
+#
+#     """
+#     res = public.get_instruments(instType=type)['data']
+#     pairs = []
+#     for i in res:
+#         pairs.append(i['instId'])
+#     return pairs
 
-def plas_order_and_tp_sl(symbol: str, side: str, size: str, tp: str, sl: str):
-    """
-    Выставляем рыночный ордер и тейкпрофит и стоплосс
-    :param symbol:      ATOM-USDT-SWAP
-    :param side:        buy или sell
-    :param size:        кол-во контрактов
-    :param tp:          цена тейкпрофита
-    :param sl:          цена стоплосса
-    :return:
-    """
-    answer = trade.place_order(instId=symbol, tdMode='cross', side=side, ordType='market',
-                               sz=size, tpTriggerPx=tp, tpOrdPx='-1', slTriggerPx=sl, slOrdPx='-1')
-    return answer['data']
-
-def pairs(type: str='SPOT') -> list:
-    """
-
-    :param type:
-    :return: {'alias': '',
-              'baseCcy': 'FTM',
-              'category': '1',
-              'ctMult': '',
-              'ctType': '',
-              'ctVal': '',
-              'ctValCcy': '',
-              'expTime': '',
-              'instFamily': '',
-              'instId': 'FTM-OKB',
-              'instType': 'SPOT',
-              'lever': '',
-              'listTime': '1635155926000',
-              'lotSz': '0.000001',
-              'maxIcebergSz': '999999999999.0000000000000000',
-              'maxLmtSz': '999999999999',
-              'maxMktSz': '1000000',
-              'maxStopSz': '1000000',
-              'maxTriggerSz': '999999999999.0000000000000000',
-              'maxTwapSz': '999999999999.0000000000000000',
-              'minSz': '1',
-              'optType': '',
-              'quoteCcy': 'OKB',
-              'settleCcy': '',
-              'state': 'live',
-              'stk': '',
-              'tickSz': '0.00001',
-              'uly': ''}
-
-    """
-    res = public.get_instruments(instType=type)['data']
-    pairs = []
-    for i in res:
-        pairs.append(i['instId'])
-    return pairs
 
 
 
 
-# Получаем общий баланс
-def balance():
-    res = accaunt.get_account_balance()
-    return res['data']
 
 def detect_accumulation(df):
     means = df.Volume.mean()
@@ -510,6 +471,7 @@ class Bot:
                         'base_cur': s['baseCcy'],
                         'quote_cur': s['quoteCcy'],
                         'min_size': s['minSz'],
+                        'lotsize': s['lotSz'],
                         'tick_size': s['tickSz'],
                         'orders': []
                     }
@@ -522,6 +484,7 @@ class Bot:
                     'base_cur': s['baseCcy'],
                     'quote_cur': s['quoteCcy'],
                     'min_size': s['minSz'],
+                    'lotsize': s['lotSz'],
                     'tick_size': s['tickSz'],
                     'orders': []
                 }
@@ -620,6 +583,28 @@ class Bot:
         # df.to_csv('df_data.csv')
         return df
 
+    def buy_order(self, inf: dict, price: float):
+        # Проверяем баланс для покупки
+        balance = OKXex().get_balance(inf['quote_cur'])[0]['availBal']
+        print(balance)
+        if float(balance) < conf.sz_quote:
+            Bot().debug('error', f'Недостаточно {inf["quote_cur"]} для выставления ордера')
+        else:
+            size = conf.sz_quote / price
+            data = {
+                'instId': inf['symbol'],
+                'tdMode': 'cash',
+                'side': 'buy',
+                'ordType': 'market',
+                'sz': '',
+                'banAmend': False,
+
+            }
+
+
+
+
+
     def zero_orders(self, inf: dict):
         if len(inf['orders']) == 0:
             # Bot().debug('debug', f'По торговой паре {inf["symbol"]} ордера не выставлялись')
@@ -628,6 +613,12 @@ class Bot:
             df.to_csv(f'df_data_{inf["symbol"]}.csv')
             if df.SIG.iloc[-2] == 'buy':
                 Bot().debug('debug', f'{inf["symbol"]}: Выставляем маркет ордер на покупку')
+                Bot().buy_order(inf=inf, price=float(df.Close.iloc[-1]))
+
+
+
+
+
         else:
             Bot().debug('debug', f'{inf["symbol"]}: Проверяем последний выставленный ордер')
 

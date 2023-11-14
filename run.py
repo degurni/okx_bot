@@ -59,6 +59,7 @@ if __name__ == '__main__':
     #     print(e)
     # except KeyboardInterrupt:
     #     Bot().debug('debug', 'Бот остановлен вручную')
+    # except
 
 
 
