@@ -20,6 +20,8 @@ def trades_bot():
                 if len(inf['orders']) == 0:
                     Bot().zero_orders(inf=inf)
 
+        time.sleep(conf.sleep_4)
+
 
 
 

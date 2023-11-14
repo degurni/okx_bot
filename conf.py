@@ -72,7 +72,7 @@ SPOT:
 
 debug = 'debug'
 
-symbols = ['LUNC-USDT', 'NEAR-USDT']
+symbols = ['LUNC-USDT', 'NEAR-USDT', 'KSM-USDT']
 tf = '15m'
 
 # symbols = ['LINK-USDT-SWAP', 'TRB-USDT-SWAP', 'DYDX-USDT-SWAP', 'AVAX-USDT-SWAP', 'GAS-USDT-SWAP',
@@ -83,3 +83,6 @@ lever = 5
 
 
 sleep_1 = 60
+sleep_2 = 30
+sleep_3 = 10
+sleep_4 = 5

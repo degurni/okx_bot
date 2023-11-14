@@ -1,6 +1,6 @@
 import json
 
-import okx.MarketData as Market
+import okx.MarketData as Market  # pip install python-okx
 from okx import Account, MarketData, PublicData, Trade
 import pandas as pd
 import pandas_ta as ta
@@ -622,11 +622,11 @@ class Bot:
 
     def zero_orders(self, inf: dict):
         if len(inf['orders']) == 0:
-            Bot().debug('debug', f'По торговой паре {inf["symbol"]} ордера не выставлялись')
+            # Bot().debug('debug', f'По торговой паре {inf["symbol"]} ордера не выставлялись')
             df = Bot().frame(symbol=inf['symbol'])
             df = Bot().add_indicator(df)
             df.to_csv(f'df_data_{inf["symbol"]}.csv')
-            if df.SIG.iloc[-1] == 'buy':
+            if df.SIG.iloc[-2] == 'buy':
                 Bot().debug('debug', f'{inf["symbol"]}: Выставляем маркет ордер на покупку')
         else:
             Bot().debug('debug', f'{inf["symbol"]}: Проверяем последний выставленный ордер')
