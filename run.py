@@ -17,8 +17,10 @@ def trades_bot():
     for symbol in conf.symbols:
         for inf in infa:
             if symbol == inf['symbol']:
-                if len(inf['orders']) == 0:
-                    Bot().zero_orders(inf=inf)
+                inf = Bot().zero_orders(inf=inf)
+    with open('trades.json', 'w') as f:
+        json.dump(infa, f, indent=2)
+
 
         time.sleep(conf.sleep_4)
 

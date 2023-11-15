@@ -72,8 +72,9 @@ SPOT:
 
 debug = 'debug'
 # < $2.5
-symbols = ['AVAX-USDT', 'FIL-USDT', 'MATIC-USDT', 'XRP-USDT', 'DYDX-USDT', 'KSM-USDT',
-          'LUNC-USDT',]
+symbols = ['MATIC-USDT']
+# symbols = ['AVAX-USDT', 'FIL-USDT', 'MATIC-USDT', 'XRP-USDT', 'DYDX-USDT', 'KSM-USDT',
+#           'LUNC-USDT',]
 # < $5
 # symbols = ['RIO-USDT', ]
 # < $10

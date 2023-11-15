@@ -555,7 +555,7 @@ class Bot:
         size = size.quantize(Decimal(lotsize), ROUND_FLOOR)
         return str(size)
 
-    def buy_order(self, inf: dict, price: float):
+    def buy_order(self, inf: dict, price: float) -> dict:
         # Проверяем баланс для покупки
         balance = OKXex().get_balance(inf['quote_cur'])[0]['availBal']
         if float(balance) < conf.sz_quote:
@@ -573,13 +573,19 @@ class Bot:
             }
             order_id = OKXex().place_order(data=data)
             order_inf = OKXex().order_details(symbol=inf['symbol'], ord_id=order_id)
-            print(order_inf)
+            res = {
+                'order_id': order_inf['ordId'],
+                'price': order_inf['avgPx'],
+                'size': str(float(order_inf['accFillSz']) + float(order_inf['fee']))
+            }
+            inf['orders'].append(res)
+            return inf
 
 
 
 
 
-    def zero_orders(self, inf: dict):
+    def zero_orders(self, inf: dict) -> dict:
         if len(inf['orders']) == 0:
             # Bot().debug('debug', f'По торговой паре {inf["symbol"]} ордера не выставлялись')
             df = Bot().frame(symbol=inf['symbol'])
@@ -587,7 +593,7 @@ class Bot:
             df.to_csv(f'df_data_{inf["symbol"]}.csv')
             if df.SIG.iloc[-2] == 'buy':
                 Bot().debug('debug', f'{inf["symbol"]}: Выставляем маркет ордер на покупку')
-                Bot().buy_order(inf=inf, price=float(df.Close.iloc[-1]))
+                inf = Bot().buy_order(inf=inf, price=float(df.Close.iloc[-1]))
 
 
 
@@ -595,4 +601,7 @@ class Bot:
 
         else:
             Bot().debug('debug', f'{inf["symbol"]}: Проверяем последний выставленный ордер')
+            print(inf['orders'])
 
+
+        return inf

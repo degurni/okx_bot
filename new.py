@@ -9,15 +9,3 @@ s = {'code': '0', 'data': [{'clOrdId': '', 'ordId': '644955062510850057', 'sCode
 
 print(s['data'][0]['ordId'])
 
-"""
-{ 
-'baseCcy': 'NEAR',              'baseCcy': 'LUNC',
-'instId': 'NEAR-USDT',          'instId': 'LUNC-USDT',
-'lever': '5',                   'lever': '5', 
-'lotSz': '0.00000001',          'lotSz': '1',
-'minSz': '5',                   'minSz': '10000',
-'quoteCcy': 'USDT',             'quoteCcy': 'USDT',
-'tickSz': '0.001',              'tickSz': '0.00000001',
-}
-
-"""
