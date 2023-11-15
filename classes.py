@@ -119,6 +119,7 @@ class OKXex:
     # TRADE
     def place_order(self, data):
         f = self.trade.place_order(**data)
+        print(f)
         return f['data'][0]['ordId']
 
     def order_details(self, symbol: str, ord_id: str):
@@ -582,7 +583,29 @@ class Bot:
             return inf
 
     def sell_order(self, inf: dict):
-        pass
+        # Проверяем баланс для продажи
+        balance = OKXex().get_balance(inf['base_cur'])[0]['availBal']
+        if len(inf['orders']) > 1 and float(balance) > 0:
+            size = float(inf['orders'][-1]['size'])
+        else:
+            size = float(balance)
+        size = Bot().leveling(size=size, lotsize=inf['lotsize'])
+        data = {
+            'instId': inf['symbol'],
+            'tdMode': 'cash',
+            'side': 'sell',
+            'ordType': 'market',
+            'tgtCcy': 'base_ccy',
+            'sz': size,
+        }
+        order_id = OKXex().place_order(data=data)
+        order_inf = OKXex().order_details(symbol=inf['symbol'], ord_id=order_id)
+        if order_inf['state'] == 'filled':
+            if len(inf['orders']) > 1:
+                inf['orders'][-2] = str(float(inf['orders'][-2]['price']) * conf.less)
+            inf['orders'].pop()
+        return inf
+
 
 
 
@@ -604,9 +627,10 @@ class Bot:
 
         else:
             Bot().debug('debug', f'{inf["symbol"]}: Проверяем последний выставленный ордер')
-            if df.Close.iloc[-1] > float(inf['orders'][-1]['price']):
+            if df.Close.iloc[-1] > float(inf['orders'][-1]['price'] * conf.steps):
                 if df.CCI_sig.iloc[-1] == 'sell' or df.MACD_sig.iloc[-1] == 'sell':
                     Bot().debug('degbug', f'{inf["symbol"]}: Выставляем маркет ордер на продажу')
+                    inf = Bot().sell_order(inf=inf)
 
             elif df.Close.iloc[-1] < float(inf['orders'][-1]['price']) * conf.steps and df.SIG.iloc[-2] == 'buy':
                 Bot().debug('debug', f'{inf["symbol"]}: Выставляем маркет ордер на покупку')

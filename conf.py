@@ -73,13 +73,17 @@ SPOT:
 debug = 'debug'
 
 # Сколько минимально процентов между ступеньками лестницы
-step_percent = 1
+step_percent = 1  # %
 steps = (100 - step_percent) * 0.01
 
+# На сколько процентов уменьшать цену предыдущего ордера
+less_percent = 10  # %
+less = (100 - less_percent) * 0.01
+
 # < $2.5
-symbols = ['MATIC-USDT']
-# symbols = ['AVAX-USDT', 'FIL-USDT', 'MATIC-USDT', 'XRP-USDT', 'DYDX-USDT', 'KSM-USDT',
-#           'LUNC-USDT',]
+# symbols = ['MATIC-USDT']
+symbols = ['AVAX-USDT', 'FIL-USDT', 'MATIC-USDT', 'XRP-USDT', 'DYDX-USDT', 'KSM-USDT',
+          'LUNC-USDT',]
 # < $5
 # symbols = ['RIO-USDT', ]
 # < $10
