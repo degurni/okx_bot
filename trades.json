@@ -1,0 +1,85 @@
+[
+  {
+    "symbol": "LUNC-USDT",
+    "base_cur": "LUNC",
+    "quote_cur": "USDT",
+    "min_size": "10000",
+    "lotsize": "1",
+    "tick_size": "0.00000001",
+    "orders": []
+  },
+  {
+    "symbol": "NEAR-USDT",
+    "base_cur": "NEAR",
+    "quote_cur": "USDT",
+    "min_size": "5",
+    "lotsize": "0.00000001",
+    "tick_size": "0.001",
+    "orders": []
+  },
+  {
+    "symbol": "KSM-USDT",
+    "base_cur": "KSM",
+    "quote_cur": "USDT",
+    "min_size": "0.01",
+    "lotsize": "0.000001",
+    "tick_size": "0.01",
+    "orders": []
+  },
+  {
+    "symbol": "AVAX-USDT",
+    "base_cur": "AVAX",
+    "quote_cur": "USDT",
+    "min_size": "0.1",
+    "lotsize": "0.000001",
+    "tick_size": "0.001",
+    "orders": []
+  },
+  {
+    "symbol": "FIL-USDT",
+    "base_cur": "FIL",
+    "quote_cur": "USDT",
+    "min_size": "0.01",
+    "lotsize": "0.000001",
+    "tick_size": "0.001",
+    "orders": []
+  },
+  {
+    "symbol": "MATIC-USDT",
+    "base_cur": "MATIC",
+    "quote_cur": "USDT",
+    "min_size": "1",
+    "lotsize": "0.000001",
+    "tick_size": "0.0001",
+    "orders": [
+      {
+        "order_id": "645024304849522735",
+        "price": "0.9186",
+        "size": "2.718810468"
+      },
+      {
+        "order_id": "645045937412804622",
+        "price": "0.9069",
+        "size": "2.754190053"
+      }
+    ]
+  },
+  {
+    "symbol": "XRP-USDT",
+    "base_cur": "XRP",
+    "quote_cur": "USDT",
+    "min_size": "1",
+    "lotsize": "0.000001",
+    "tick_size": "0.0001",
+    "orders": []
+  },
+  {
+    "symbol": "DYDX-USDT",
+    "base_cur": "DYDX",
+    "quote_cur": "USDT",
+    "min_size": "0.1",
+    "lotsize": "0.000001",
+    "tick_size": "0.001",
+    "orders": []
+  }
+]
