@@ -6,6 +6,7 @@ import pandas as pd
 import pandas_ta as ta
 from sklearn import preprocessing
 import numpy as np
+from decimal import Decimal, ROUND_FLOOR
 import math
 import datetime
 import os
@@ -118,69 +119,70 @@ class OKXex:
     # TRADE
     def place_order(self, data):
         f = self.trade.place_order(**data)
-        print(f)
+        return f['data'][0]['ordId']
+
+    def order_details(self, symbol: str, ord_id: str):
+        """
+
+        :param symbol:
+        :param ord_id:
+        :return: {'accFillSz': '0.019825',
+                  'algoClOrdId': '',
+                  'algoId': '',
+                  'attachAlgoClOrdId': '',
+                  'attachAlgoOrds': [],
+                  'avgPx': '25.22',
+                  'cTime': '1700040545922',
+                  'cancelSource': '',
+                  'cancelSourceReason': '',
+                  'category': 'normal',
+                  'ccy': '',
+                  'clOrdId': '',
+                  'fee': '-0.000019825',
+                  'feeCcy': 'KSM',
+                  'fillPx': '25.22',
+                  'fillSz': '0.019825',
+                  'fillTime': '1700040545924',
+                  'instId': 'KSM-USDT',
+                  'instType': 'SPOT',
+                  'lever': '',
+                  'ordId': '644952027235651597',
+                  'ordType': 'market',
+                  'pnl': '0',
+                  'posSide': 'net',
+                  'px': '',
+                  'pxType': '',
+                  'pxUsd': '',
+                  'pxVol': '',
+                  'quickMgnType': '',
+                  'rebate': '0',
+                  'rebateCcy': 'USDT',
+                  'reduceOnly': 'false',
+                  'side': 'buy',
+                  'slOrdPx': '',
+                  'slTriggerPx': '',
+                  'slTriggerPxType': '',
+                  'source': '',
+                  'state': 'filled',
+                  'stpId': '',
+                  'stpMode': '',
+                  'sz': '0.5',
+                  'tag': '',
+                  'tdMode': 'cash',
+                  'tgtCcy': 'quote_ccy',
+                  'tpOrdPx': '',
+                  'tpTriggerPx': '',
+                  'tpTriggerPxType': '',
+                  'tradeId': '20809503',
+                  'uTime': '1700040545927'}
+
+        """
+        return self.trade.get_order(instId=symbol, ordId=ord_id)['data'][0]
 
 
 
 
-#
-# def order_details(symbol: str, ord_id: str):
-#     """
-#
-#     :param symbol:
-#     :param ord_id:
-#     :return:{'accFillSz': '1',
-#              'algoClOrdId': '',
-#              'algoId': '',
-#              'attachAlgoClOrdId': '',
-#              'avgPx': '126.466',
-#              'cTime': '1699298365373',
-#              'cancelSource': '',
-#              'cancelSourceReason': '',
-#              'category': 'normal',
-#              'ccy': '',
-#              'clOrdId': '',
-#              'fee': '-0.0063233',
-#              'feeCcy': 'USDT',
-#              'fillPx': '126.466',
-#              'fillSz': '1',
-#              'fillTime': '1699298365373',
-#              'instId': 'TRB-USDT-SWAP',
-#              'instType': 'SWAP',
-#              'lever': '10',
-#              'ordId': '641839096390262784',
-#              'ordType': 'market',
-#              'pnl': '0',
-#              'posSide': 'net',
-#              'px': '',
-#              'pxType': '',
-#              'pxUsd': '',
-#              'pxVol': '',
-#              'quickMgnType': '',
-#              'rebate': '0',
-#              'rebateCcy': 'USDT',
-#              'reduceOnly': 'false',
-#              'side': 'buy',
-#              'slOrdPx': '',
-#              'slTriggerPx': '',
-#              'slTriggerPxType': '',
-#              'source': '',
-#              'state': 'filled',
-#              'stpId': '',
-#              'stpMode': '',
-#              'sz': '1',
-#              'tag': '',
-#              'tdMode': 'cross',
-#              'tgtCcy': '',
-#              'tpOrdPx': '',
-#              'tpTriggerPx': '',
-#              'tpTriggerPxType': '',
-#              'tradeId': '135788695',
-#              'uTime': '1699298365375'}
-#
-#     """
-#     return trade.get_order(instId=symbol, ordId=ord_id)['data'][0]
-#
+
 # # Получить открытые позиции
 # def get_positions(symbol: str = None):
 #     """
@@ -387,41 +389,6 @@ def _lenght_vektor(df):
     df['vector_sig'] = vector_sig
     return df
 
-def _chek_signal(df):
-    sig = [0] * len(df)
-    for i in range(len(df)):
-        if df.CCI_sig.iloc[i] == 'SHORT' and df.MACD_sig.iloc[i] == 'SHORT':
-            sig[i] = 'SHORT'
-            # print(df.index[i], sig[i])
-        elif df.CCI_sig.iloc[i] == 'LONG' and df.MACD_sig.iloc[i] == 'LONG':
-            sig[i] = 'LONG'
-            # print(df.index[i], sig[i])
-    df['SIG'] = sig
-    # print(df.SIG.value_counts())
-    return df
-
-def _chek_CCI_signal(df: pd.DataFrame) ->pd.DataFrame:
-    predel = 100
-    cci_sig = [0] * len(df)
-    for i in range(len(df)):
-        if df.CCI.iloc[i - 2] > df.CCI.iloc[i - 1] < df.CCI.iloc[i] < -1 * predel:
-            cci_sig[i] = 'LONG'
-        elif df.CCI.iloc[i - 2] < df.CCI.iloc[i - 1] > df.CCI.iloc[i] > predel:
-            cci_sig[i] = 'SHORT'
-    df['CCI_sig'] = cci_sig
-    # print(df.CCI_sig.value_counts())
-    return df
-
-def _chek_macd_signal(df: pd.DataFrame) -> pd.DataFrame:
-    macd_sig = [0] * len(df)
-    for i in range(len(df)):
-        if df.MACD.iloc[i-2] < df.MACD.iloc[i-1] > df.MACD.iloc[i] and df.MACDh.iloc[i -1] > df.MACDh.iloc[i] > 0:
-            macd_sig[i] = 'SHORT'
-        elif df.MACD.iloc[i-2] > df.MACD.iloc[i-1] < df.MACD.iloc[i] and df.MACDh.iloc[i -1] < df.MACDh.iloc[i] < 0:
-            macd_sig[i] = 'LONG'
-    df['MACD_sig'] = macd_sig
-    # print(df.MACD_sig.value_counts())
-    return df
 
 
 
@@ -583,23 +550,29 @@ class Bot:
         # df.to_csv('df_data.csv')
         return df
 
+    def leveling(self, size: float, lotsize: str):
+        size = Decimal(str(size))
+        size = size.quantize(Decimal(lotsize), ROUND_FLOOR)
+        return str(size)
+
     def buy_order(self, inf: dict, price: float):
         # Проверяем баланс для покупки
         balance = OKXex().get_balance(inf['quote_cur'])[0]['availBal']
-        print(balance)
         if float(balance) < conf.sz_quote:
             Bot().debug('error', f'Недостаточно {inf["quote_cur"]} для выставления ордера')
         else:
             size = conf.sz_quote / price
+            size = Bot().leveling(size=size, lotsize=inf['lotsize'])
             data = {
                 'instId': inf['symbol'],
                 'tdMode': 'cash',
                 'side': 'buy',
                 'ordType': 'market',
-                'sz': '',
-                'banAmend': False,
-
+                'tgtCcy': 'base_ccy',
+                'sz': size,
             }
+            order_id = OKXex().place_order(data=data)
+            order_inf = OKXex().order_details(symbol=inf['symbol'], ord_id=order_id)
 
 
 
