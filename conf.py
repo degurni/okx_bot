@@ -71,6 +71,11 @@ SPOT:
 
 
 debug = 'debug'
+
+# Сколько минимально процентов между ступеньками лестницы
+step_percent = 1
+steps = (100 - step_percent) * 0.01
+
 # < $2.5
 symbols = ['MATIC-USDT']
 # symbols = ['AVAX-USDT', 'FIL-USDT', 'MATIC-USDT', 'XRP-USDT', 'DYDX-USDT', 'KSM-USDT',

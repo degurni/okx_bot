@@ -581,16 +581,19 @@ class Bot:
             inf['orders'].append(res)
             return inf
 
+    def sell_order(self, inf: dict):
+        pass
+
 
 
 
 
     def zero_orders(self, inf: dict) -> dict:
+        df = Bot().frame(symbol=inf['symbol'])
+        df = Bot().add_indicator(df)
+        df.to_csv(f'df_data_{inf["symbol"]}.csv')
         if len(inf['orders']) == 0:
             # Bot().debug('debug', f'По торговой паре {inf["symbol"]} ордера не выставлялись')
-            df = Bot().frame(symbol=inf['symbol'])
-            df = Bot().add_indicator(df)
-            df.to_csv(f'df_data_{inf["symbol"]}.csv')
             if df.SIG.iloc[-2] == 'buy':
                 Bot().debug('debug', f'{inf["symbol"]}: Выставляем маркет ордер на покупку')
                 inf = Bot().buy_order(inf=inf, price=float(df.Close.iloc[-1]))
@@ -601,7 +604,13 @@ class Bot:
 
         else:
             Bot().debug('debug', f'{inf["symbol"]}: Проверяем последний выставленный ордер')
-            print(inf['orders'])
+            if df.Close.iloc[-1] > float(inf['orders'][-1]['price']):
+                if df.CCI_sig.iloc[-1] == 'sell' or df.MACD_sig.iloc[-1] == 'sell':
+                    Bot().debug('degbug', f'{inf["symbol"]}: Выставляем маркет ордер на продажу')
+
+            elif df.Close.iloc[-1] < float(inf['orders'][-1]['price']) * conf.steps and df.SIG.iloc[-2] == 'buy':
+                Bot().debug('debug', f'{inf["symbol"]}: Выставляем маркет ордер на покупку')
+                inf = Bot().buy_order(inf=inf, price=float(df.Close.iloc[-1]))
 
 
         return inf
