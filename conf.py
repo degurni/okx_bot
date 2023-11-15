@@ -71,9 +71,14 @@ SPOT:
 
 
 debug = 'debug'
-
-symbols = ['LUNC-USDT', 'NEAR-USDT', 'KSM-USDT']
-sz_quote = 10  # Размер ордера на закуп в USD
+# < $2.5
+symbols = ['AVAX-USDT', 'FIL-USDT', 'MATIC-USDT', 'XRP-USDT', 'DYDX-USDT', 'KSM-USDT',
+          'LUNC-USDT',]
+# < $5
+# symbols = ['RIO-USDT', ]
+# < $10
+# symbols = ['LUNC-USDT', 'NEAR-USDT', 'KSM-USDT']
+sz_quote = 2.5  # Размер ордера на закуп в USD
 tf = '15m'
 
 # symbols = ['LINK-USDT-SWAP', 'TRB-USDT-SWAP', 'DYDX-USDT-SWAP', 'AVAX-USDT-SWAP', 'GAS-USDT-SWAP',

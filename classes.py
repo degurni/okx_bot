@@ -573,6 +573,7 @@ class Bot:
             }
             order_id = OKXex().place_order(data=data)
             order_inf = OKXex().order_details(symbol=inf['symbol'], ord_id=order_id)
+            print(order_inf)
 
 
 
