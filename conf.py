@@ -74,7 +74,7 @@ debug = 'debug'
 
 # Сколько минимально процентов между ступеньками лестницы
 step_percent = 1  # %
-steps = (100 + step_percent) * 0.01
+steps = [(100 + step_percent) * 0.01, (100 - step_percent) * 0.01]
 
 # На сколько процентов уменьшать цену предыдущего ордера
 less_percent = 10  # %
