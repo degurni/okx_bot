@@ -540,9 +540,16 @@ class Bot:
         dn = ma - mid
         fast_ma = ta.sma(close=rsi, length=rsi_pl_length)
         slow_ma = ta.sma(close=rsi, length=trade_sl_length)
+        # Signal
+        signal = [0] * len(df)
+        for i in range(len(df)):
+            if fast_ma.iloc[i - 1] < dn.iloc[i - 1] and fast_ma.iloc[i - 2] > fast_ma.iloc[i - 1] < fast_ma.iloc[i]:
+                signal[i] = 'buy'
+            elif fast_ma.iloc[i - 2] < fast_ma.iloc[i - 1] > fast_ma.iloc[i]:
+                signal[i] = 'sell'
+        df['SIG'] = signal
+        return df
 
-        print(fast_ma)
-        print(slow_ma)
 
 
 
@@ -625,35 +632,26 @@ class Bot:
             inf['orders'].pop()
         return inf
 
-
-
-
-
-
     def zero_orders(self, inf: dict) -> dict:
         df = Bot().frame(symbol=inf['symbol'])
-        df = Bot().add_indicator(df)
+        df = Bot().indicator(df)
         df.to_csv(f'df_data_{inf["symbol"]}.csv')
-        if len(inf['orders']) == 0:
-            # Bot().debug('debug', f'По торговой паре {inf["symbol"]} ордера не выставлялись')
-            if df.SIG.iloc[-2] == 'buy':
+        if len(inf['orders']) == 0:  # Если ордеров ещё не было
+            if df.SIG.iloc[-1] == 'buy':  # Если сигнал на покупку
                 Bot().debug('debug', f'{inf["symbol"]}: Выставляем маркет ордер на покупку')
                 inf = Bot().buy_order(inf=inf, price=float(df.Close.iloc[-1]))
 
-
-
-
-
-        else:
-            Bot().debug('debug', f'{inf["symbol"]}: Проверяем последний выставленный ордер')
+        else:  # Если ордера по инструменту уже стоят
+            # Bot().debug('debug', f'{inf["symbol"]}: Проверяем последний выставленный ордер')
+            # Если последняя цена больше последнего ордера на покупку
             if df.Close.iloc[-1] > float(inf['orders'][-1]['price']) * conf.steps:
-                if df.CCI_sig.iloc[-1] == 'sell' or df.MACD_sig.iloc[-1] == 'sell':
+                if df.SIG.iloc[-1] == 'sell':
                     Bot().debug('degbug', f'{inf["symbol"]}: Выставляем маркет ордер на продажу')
                     inf = Bot().sell_order(inf=inf)
 
+            # Если сигнал на покупку
             elif df.Close.iloc[-1] < float(inf['orders'][-1]['price']) * conf.steps and df.SIG.iloc[-2] == 'buy':
                 Bot().debug('debug', f'{inf["symbol"]}: Выставляем маркет ордер на покупку')
                 inf = Bot().buy_order(inf=inf, price=float(df.Close.iloc[-1]))
-
 
         return inf
