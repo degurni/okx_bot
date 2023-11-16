@@ -643,14 +643,13 @@ class Bot:
 
         else:  # Если ордера по инструменту уже стоят
             # Bot().debug('debug', f'{inf["symbol"]}: Проверяем последний выставленный ордер')
-            # Если последняя цена больше последнего ордера на покупку
-            if df.Close.iloc[-1] > float(inf['orders'][-1]['price']) * conf.steps[1]:
-                if df.SIG.iloc[-1] == 'sell':
-                    Bot().debug('degbug', f'{inf["symbol"]}: Выставляем маркет ордер на продажу')
-                    inf = Bot().sell_order(inf=inf)
+            # Если последняя цена больше цены последнего ордера на указанный процент и сигнал на продажу
+            if df.Close.iloc[-1] > float(inf['orders'][-1]['price']) * conf.steps[0] and df.SIG.iloc[-1] == 'sell':
+                Bot().debug('degbug', f'{inf["symbol"]}: Выставляем маркет ордер на продажу')
+                inf = Bot().sell_order(inf=inf)
 
-            # Если сигнал на покупку
-            elif df.Close.iloc[-1] < float(inf['orders'][-1]['price']) * conf.steps[0] and df.SIG.iloc[-2] == 'buy':
+            # Если последняя цена муньше цены последнего ордера на указаный процент и сигнал на покупку
+            elif df.Close.iloc[-1] < float(inf['orders'][-1]['price']) * conf.steps[1] and df.SIG.iloc[-2] == 'buy':
                 Bot().debug('debug', f'{inf["symbol"]}: Выставляем маркет ордер на покупку')
                 inf = Bot().buy_order(inf=inf, price=float(df.Close.iloc[-1]))
 
