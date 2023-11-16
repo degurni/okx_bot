@@ -528,6 +528,25 @@ class Bot:
         # df.to_csv('df_data.csv')
         return df
 
+    def indicator(self, df: pd.DataFrame) -> pd.DataFrame:
+        rsi_period = 21
+        band_length = 34
+        rsi_pl_length = 2
+        trade_sl_length = 7
+        rsi = ta.rsi(close=df.Close, length=rsi_period)
+        ma = ta.sma(close=rsi, length=band_length)
+        mid = (1.6185 * ta.stdev(close=rsi, length=band_length))
+        up = ma + mid
+        dn = ma - mid
+        fast_ma = ta.sma(close=rsi, length=rsi_pl_length)
+        slow_ma = ta.sma(close=rsi, length=trade_sl_length)
+
+        print(fast_ma)
+        print(slow_ma)
+
+
+
+
     # Преобразовываем данные о свечах в датафрейм
     def frame(self, symbol):
         data = OKXex().candles(pair=symbol, tf=conf.tf)

@@ -1,6 +1,10 @@
 from classes import OKXex, Bot
 
 
-order_inf = OKXex().order_details(symbol='MATIC-USDT', ord_id='645113822290153484')
+symbol = 'DYDX-USDT'
 
-print(order_inf['state'])
+df = Bot().frame(symbol)
+Bot().indicator(df)
+
+
+
