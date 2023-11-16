@@ -78,8 +78,8 @@ steps = (100 - step_percent) * 0.01
 
 # На сколько процентов уменьшать цену предыдущего ордера
 less_percent = 10  # %
-less = (100 - less_percent) * 0.01
-
+less = 1 - (less_percent / 10000)
+#
 # < $2.5
 # symbols = ['MATIC-USDT']
 symbols = ['AVAX-USDT', 'FIL-USDT', 'MATIC-USDT', 'XRP-USDT', 'DYDX-USDT', 'KSM-USDT',

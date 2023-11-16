@@ -602,7 +602,7 @@ class Bot:
         order_inf = OKXex().order_details(symbol=inf['symbol'], ord_id=order_id)
         if order_inf['state'] == 'filled':
             if len(inf['orders']) > 1:
-                inf['orders'][-2] = str(float(inf['orders'][-2]['price']) * conf.less)
+                inf['orders'][-2]['price'] = str(float(inf['orders'][-2]['price']) * conf.less)
             inf['orders'].pop()
         return inf
 
@@ -627,7 +627,7 @@ class Bot:
 
         else:
             Bot().debug('debug', f'{inf["symbol"]}: Проверяем последний выставленный ордер')
-            if df.Close.iloc[-1] > float(inf['orders'][-1]['price'] * conf.steps):
+            if df.Close.iloc[-1] > float(inf['orders'][-1]['price']) * conf.steps:
                 if df.CCI_sig.iloc[-1] == 'sell' or df.MACD_sig.iloc[-1] == 'sell':
                     Bot().debug('degbug', f'{inf["symbol"]}: Выставляем маркет ордер на продажу')
                     inf = Bot().sell_order(inf=inf)
