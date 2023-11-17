@@ -68,7 +68,7 @@
     ]
   },
   {
-    "symbol":  "MATIC-USDT",
+    "symbol": "MATIC-USDT",
     "base_cur": "MATIC",
     "quote_cur": "USDT",
     "min_size": "1",
