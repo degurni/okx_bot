@@ -36,14 +36,7 @@ def trades_bot():
 
 
 
-
-
-
-
-
-
-if __name__ == '__main__':
-
+def main():
     start()
     while True:
         trades_bot()
@@ -51,17 +44,27 @@ if __name__ == '__main__':
 
 
 
-    # try:
-    #     start()
-    #     while True:
-    #         trades_bot()
-    #         time.sleep(conf.sleep_1)
-    #
-    # except Exception as e:
-    #     print(e)
-    # except KeyboardInterrupt:
-    #     Bot().debug('debug', 'Бот остановлен вручную')
-    # except
+
+
+if __name__ == '__main__':
+
+    # start()
+    # while True:
+    #     trades_bot()
+    #     time.sleep(conf.sleep_1)
+
+
+
+    try:
+        main()
+
+    except Exception as e:
+        print(e)
+        time.sleep(conf.sleep_1)
+        main()
+    except KeyboardInterrupt:
+        Bot().debug('debug', 'Бот остановлен вручную')
+
 
 
 
