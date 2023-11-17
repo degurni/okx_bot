@@ -1,7 +1,7 @@
 from classes import OKXex, Bot
 
 
-symbol = 'DYDX-USDT'
+symbol = 'XRP-USDT'
 
 df = Bot().frame(symbol)
 df = Bot().indicator(df)

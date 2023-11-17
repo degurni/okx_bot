@@ -535,15 +535,17 @@ class Bot:
         trade_sl_length = 7
         rsi = ta.rsi(close=df.Close, length=rsi_period)
         ma = ta.sma(close=rsi, length=band_length)
-        mid = (1.6185 * ta.stdev(close=rsi, length=band_length))
-        up = ma + mid
-        dn = ma - mid
+        m = (1.6185 * ta.stdev(close=rsi, length=band_length))
+        up = ma + m
+        dn = ma - m
+        mid = (up + dn) / 2
         fast_ma = ta.sma(close=rsi, length=rsi_pl_length)
         slow_ma = ta.sma(close=rsi, length=trade_sl_length)
         # Signal
         signal = [0] * len(df)
         for i in range(len(df)):
-            if fast_ma.iloc[i - 1] < dn.iloc[i - 1] and fast_ma.iloc[i - 2] > fast_ma.iloc[i - 1] < fast_ma.iloc[i]:
+            # Если Fast-линия ниже средней и развернулась
+            if fast_ma.iloc[i - 1] < mid.iloc[i - 1] and fast_ma.iloc[i - 2] > fast_ma.iloc[i - 1] < fast_ma.iloc[i]:
                 signal[i] = 'buy'
             elif fast_ma.iloc[i - 2] < fast_ma.iloc[i - 1] > fast_ma.iloc[i]:
                 signal[i] = 'sell'
