@@ -119,7 +119,7 @@ class OKXex:
     # TRADE
     def place_order(self, data):
         f = self.trade.place_order(**data)
-        print(f)
+        # print(f)
         return f['data'][0]['ordId']
 
     def order_details(self, symbol: str, ord_id: str):
@@ -602,11 +602,13 @@ class Bot:
             }
             order_id = OKXex().place_order(data=data)
             order_inf = OKXex().order_details(symbol=inf['symbol'], ord_id=order_id)
+            size = str(float(order_inf['accFillSz']) + float(order_inf['fee']))
             res = {
                 'order_id': order_inf['ordId'],
                 'price': order_inf['avgPx'],
-                'size': str(float(order_inf['accFillSz']) + float(order_inf['fee']))
+                'size': size
             }
+            Bot().debug('debug', f'Куплено {size} {inf["base_cur"]} по цене {order_inf["avgPx"]} {inf["quote_cur"]}')
             inf['orders'].append(res)
             return inf
 
@@ -629,6 +631,8 @@ class Bot:
         order_id = OKXex().place_order(data=data)
         order_inf = OKXex().order_details(symbol=inf['symbol'], ord_id=order_id)
         if order_inf['state'] == 'filled':
+            Bot().debug('error', f'Продано {order_inf["accFillSz"]} {inf["base_cur"]} по цене '
+                                 f'{order_inf["avgPx"]} {inf["quote_cur"]}')
             if len(inf['orders']) > 1:
                 inf['orders'][-2]['price'] = str(float(inf['orders'][-2]['price']) * conf.less)
             inf['orders'].pop()
