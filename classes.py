@@ -655,7 +655,8 @@ class Bot:
                 inf = Bot().sell_order(inf=inf)
 
             # Если последняя цена муньше цены последнего ордера на указаный процент и сигнал на покупку
-            elif df.Close.iloc[-1] < float(inf['orders'][-1]['price']) * conf.steps[1] and df.SIG.iloc[-2] == 'buy':
+            elif df.Close.iloc[-1] < float(inf['orders'][-1]['price']) * conf.steps[1] and \
+                    df.SIG.iloc[-2] == 'buy':
                 Bot().debug('debug', f'{inf["symbol"]}: Выставляем маркет ордер на покупку')
                 inf = Bot().buy_order(inf=inf, price=float(df.Close.iloc[-1]))
 
