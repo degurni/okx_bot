@@ -114,6 +114,7 @@ class OKXex:
             res = self.accaunt.get_account_balance(ccy=currency)
         else:
             res = self.accaunt.get_account_balance()
+        # print(res)
         return res['data'][0]['details']
 
     # TRADE
