@@ -82,7 +82,7 @@ less = 1 - (less_percent / 10000)
 #
 # < $2.5
 # symbols = ['MATIC-USDT']
-symbols = ['AVAX-USDT', 'FIL-USDT', 'MATIC-USDT', 'XRP-USDT', 'DYDX-USDT', 'KSM-USDT',
+symbols = ['AVAX-USDT', 'FIL-USDT', 'MATIC-USDT', 'XRP-USDT', 'DYDX-USDT',
           'LUNC-USDT',]
 # < $5
 # symbols = ['RIO-USDT', ]
