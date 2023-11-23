@@ -81,13 +81,12 @@ less_percent = 10  # %
 less = 1 - (less_percent / 10000)
 #
 # < $2.5
-# symbols = ['MATIC-USDT']
 symbols = ['AVAX-USDT', 'FIL-USDT', 'MATIC-USDT', 'XRP-USDT', 'DYDX-USDT',
-          'LUNC-USDT',]
+          'LUNC-USDT']
 # < $5
-# symbols = ['RIO-USDT', ]
+# symbols = ['RIO-USDT', 'KSM-USDT']
 # < $10
-# symbols = ['LUNC-USDT', 'NEAR-USDT', 'KSM-USDT']
+# symbols = ['LUNC-USDT', 'NEAR-USDT', ]
 sz_quote = 2.5  # Размер ордера на закуп в USD
 tf = '15m'
 
