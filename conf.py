@@ -1,4 +1,11 @@
 
+# pip install python-okx
+# pip install pandas
+# pip install pandas-ta
+
+
+
+
 
 key = '37183f91-bb5e-43c7-ab98-979474209be9'
 secret = '5AD20C1E094508003865FAA2B1B18E8D'
@@ -79,8 +86,7 @@ steps = [(100 + step_percent) * 0.01, (100 - step_percent) * 0.01]
 # На сколько процентов уменьшать цену предыдущего ордера
 less_percent = 10  # %
 less = 1 - (less_percent / 10000)
-#
-# < $2.5
+
 symbols = ['AVAX-USDT', 'FIL-USDT', 'MATIC-USDT', 'XRP-USDT', 'DYDX-USDT',
           'LUNC-USDT']
 

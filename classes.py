@@ -1,11 +1,9 @@
 import json
 
-import okx.MarketData as Market  # pip install python-okx
+import okx.MarketData as Market
 from okx import Account, MarketData, PublicData, Trade
 import pandas as pd
 import pandas_ta as ta
-from sklearn import preprocessing
-import numpy as np
 from decimal import Decimal, ROUND_FLOOR
 import math
 import datetime
@@ -181,46 +179,6 @@ class OKXex:
         """
         return self.trade.get_order(instId=symbol, ordId=ord_id)['data'][0]
 
-
-
-
-def detect_accumulation(df):
-    means = df.Volume.mean()
-
-    accum = [0] * len(df)
-    detect = [0] * len(df)
-    sum_detect = [0] * len(df)
-    for i in range(len(df)):
-        accum[i] = round(means / df.Volume.iloc[i], 2)
-        detect[i] = round(df.Volume.diff().iloc[i] / df.Volume.iloc[i], 2)
-    df['accum'] = accum
-    df['detect'] = detect
-
-    sum_detect[-1] = df.detect.iloc[-1]
-    for i in reversed(range(len(df) - 1)):
-        sum_detect[i] = sum_detect[i + 1] + df.detect.iloc[i]
-    df['sum_detect'] = sum_detect
-    print(df.sum_detect.max())
-    df.to_csv('df_data.csv')
-
-def _lenght_vektor(df):
-    lenght_v = [0] * len(df)
-    vector_sig = [0] * len(df)
-    for i in range(len(df)):
-        lenght_v[i] = math.sqrt(1 + (abs(df.MACD.iloc[i]) - abs(df.MACD.iloc[i-1])) ** 2)
-        if lenght_v[i] > 1.000_012:
-            vector_sig[i] = 2
-        elif lenght_v[i] > 1.000_009:
-            vector_sig[i] = 1
-    df['lenght_v'] = lenght_v
-    df['vector_sig'] = vector_sig
-    return df
-
-
-
-
-
-
 class Bot:
 
     def _time(self):
@@ -301,83 +259,6 @@ class Bot:
                 Bot().debug('debug', f'Открыто {len(inf)} позиций')
         return s
 
-    def _chek_signal(self, df):
-        sig = [0] * len(df)
-        for i in range(len(df)):
-            if df.CCI_sig.iloc[i] == 'sell' and df.MACD_sig.iloc[i] == 'sell':
-                sig[i] = 'sell'
-                # print(df.index[i], sig[i])
-            elif df.CCI_sig.iloc[i] == 'buy' and df.MACD_sig.iloc[i] == 'buy':
-                sig[i] = 'buy'
-                # print(df.index[i], sig[i])
-        df['SIG'] = sig
-        # print(df.SIG.value_counts())
-        return df
-
-    def _chek_CCI_signal(self, df: pd.DataFrame) -> pd.DataFrame:
-        predel = 90
-        cci_sig = [0] * len(df)
-        for i in range(len(df)):
-            if df.CCI.iloc[i] > predel and df.CCI.iloc[i] < df.CCI.iloc[i - 1]:
-                cci_sig[i] = 'sell'
-            elif df.CCI.iloc[i] < -1 * predel and df.CCI.iloc[i] > df.CCI.iloc[i - 1]:
-                cci_sig[i] = 'buy'
-        df['CCI_sig'] = cci_sig
-        # print(df.CCI_sig.value_counts())
-        return df
-
-    def _chek_macd_signal(self, df: pd.DataFrame) -> pd.DataFrame:
-        predel = 0.3
-        macd_sig = [0] * len(df)
-        for i in range(len(df)):
-            if df.MACDh.iloc[i] > predel and df.MACDh.iloc[i] < df.MACDh.iloc[i - 1]:
-                macd_sig[i] = 'sell'
-            elif df.MACDh.iloc[i] < -1 * predel and df.MACDh.iloc[i] > df.MACDh.iloc[i - 1]:
-                macd_sig[i] = 'buy'
-        df['MACD_sig'] = macd_sig
-        # print(df.MACD_sig.value_counts())
-        return df
-
-    def add_indicator(self, df: pd.DataFrame) -> pd.DataFrame:
-        df[['MACD', 'MACDh', 'MACDs']] = ta.macd(close=df.Close, fast=12, slow=26, signal=9)
-        scaler = preprocessing.MinMaxScaler(feature_range=(-1, 1))
-        df['MACD'] = scaler.fit_transform(df[['MACD']])
-        df['MACDh'] = scaler.fit_transform(df[['MACDh']])
-        df['MACDs'] = scaler.fit_transform(df[['MACDs']])
-
-        df['CCI'] = ta.cci(high=df.High, low=df.Low, close=df.Close, length=40)
-
-        df = Bot()._chek_CCI_signal(df=df)
-        df = Bot()._chek_macd_signal(df=df)
-
-        df = Bot()._chek_signal(df)
-        # df.to_csv('df_data.csv')
-        return df
-
-    def indicator(self, df: pd.DataFrame) -> pd.DataFrame:
-        rsi_period = 21
-        band_length = 34
-        rsi_pl_length = 2
-        trade_sl_length = 7
-        rsi = ta.rsi(close=df.Close, length=rsi_period)
-        ma = ta.sma(close=rsi, length=band_length)
-        m = (1.6185 * ta.stdev(close=rsi, length=band_length))
-        up = ma + m
-        dn = ma - m
-        mid = (up + dn) / 2
-        fast_ma = ta.sma(close=rsi, length=rsi_pl_length)
-        slow_ma = ta.sma(close=rsi, length=trade_sl_length)
-        # Signal
-        signal = [0] * len(df)
-        for i in range(len(df)):
-            # Если Fast-линия ниже средней и развернулась
-            if fast_ma.iloc[i - 1] < mid.iloc[i - 1] and fast_ma.iloc[i - 2] > fast_ma.iloc[i - 1] < fast_ma.iloc[i]:
-                signal[i] = 'buy'
-            elif fast_ma.iloc[i - 2] < fast_ma.iloc[i - 1] > fast_ma.iloc[i]:
-                signal[i] = 'sell'
-        df['SIG'] = signal
-        return df
-
     def indicator_TSI(self, df: pd.DataFrame) -> pd.DataFrame:
         fast = 25
         slow = 13
@@ -391,8 +272,6 @@ class Bot:
                 signal[i] = 'sell'
         df['SIG'] = signal
         return df
-
-
 
     # Преобразовываем данные о свечах в датафрейм
     def frame(self, symbol):
