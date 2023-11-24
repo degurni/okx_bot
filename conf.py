@@ -3,10 +3,6 @@
 # pip install pandas
 # pip install pandas-ta
 
-
-
-
-
 key = '37183f91-bb5e-43c7-ab98-979474209be9'
 secret = '5AD20C1E094508003865FAA2B1B18E8D'
 passw = '#-ffD7GnC*eL9k~'
@@ -76,7 +72,6 @@ SPOT:
         OKDOT2-DOT
 """
 
-
 debug = 'debug'
 
 # Сколько минимально процентов между ступеньками лестницы
@@ -87,8 +82,7 @@ steps = [(100 + step_percent) * 0.01, (100 - step_percent) * 0.01]
 less_percent = 10  # %
 less = 1 - (less_percent / 10000)
 
-symbols = ['AVAX-USDT', 'FIL-USDT', 'MATIC-USDT', 'XRP-USDT', 'DYDX-USDT',
-          'LUNC-USDT']
+symbols = ['AVAX-USDT', 'FIL-USDT', 'MATIC-USDT', 'XRP-USDT', 'DYDX-USDT', 'LUNC-USDT']
 
 sz_quote = 2.5  # Размер ордера на закуп в USD
 tf = '15m'

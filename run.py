@@ -5,9 +5,6 @@ import time
 import conf
 from classes import OKXex, Bot
 
-
-
-
 def start():
     Bot().chek_files()  # Проверяем существование файла <trades.json>
     Bot().fill_trades_file()
@@ -24,18 +21,6 @@ def trades_bot():
 
 
         time.sleep(conf.sleep_4)
-
-
-
-
-
-
-
-
-
-
-
-
 
 def main():
     start()
