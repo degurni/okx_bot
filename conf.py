@@ -83,19 +83,9 @@ less = 1 - (less_percent / 10000)
 # < $2.5
 symbols = ['AVAX-USDT', 'FIL-USDT', 'MATIC-USDT', 'XRP-USDT', 'DYDX-USDT',
           'LUNC-USDT']
-# < $5
-# symbols = ['RIO-USDT', 'KSM-USDT']
-# < $10
-# symbols = ['LUNC-USDT', 'NEAR-USDT', ]
+
 sz_quote = 2.5  # Размер ордера на закуп в USD
 tf = '15m'
-
-# symbols = ['LINK-USDT-SWAP', 'TRB-USDT-SWAP', 'DYDX-USDT-SWAP', 'AVAX-USDT-SWAP', 'GAS-USDT-SWAP',
-#            'KSM-USDT-SWAP', 'MANA-USDT-SWAP', 'MASK-USDT-SWAP', 'MKR-USDT-SWAP', 'OP-USDT-SWAP',
-#            'SNX-USDT-SWAP', 'THETA-USDT-SWAP', 'UNI-USDT-SWAP', 'ZIL-USDT-SWAP']
-lever = 5
-
-
 
 sleep_1 = 60
 sleep_2 = 30
