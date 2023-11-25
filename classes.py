@@ -259,6 +259,7 @@ class Bot:
                 Bot().debug('debug', f'Открыто {len(inf)} позиций')
         return s
 
+    # Индекс истинной силы
     def indicator_TSI(self, df: pd.DataFrame) -> pd.DataFrame:
         fast = 25
         slow = 13
