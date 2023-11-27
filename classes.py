@@ -306,6 +306,8 @@ class Bot:
         # Проверяем баланс для покупки
         balance = OKXex().get_balance(inf['quote_cur'])[0]['availBal']
         if float(balance) < conf.sz_quote:
+            print(balance)
+
             Bot().debug('error', f'Недостаточно {inf["quote_cur"]} для выставления ордера')
         else:
             size = conf.sz_quote / price
