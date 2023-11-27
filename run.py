@@ -25,6 +25,8 @@ def trades_bot():
 def main():
     start()
     while True:
+        # trades_bot()
+        # time.sleep(conf.sleep_1)
         try:
             trades_bot()
             time.sleep(conf.sleep_1)

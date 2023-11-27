@@ -109,11 +109,14 @@ class OKXex:
     # Получаем баланс
     def get_balance(self, currency: str = None):
         if currency:
-            res = self.accaunt.get_account_balance(ccy=currency)
+            r = self.accaunt.get_account_balance(ccy=currency)
         else:
-            res = self.accaunt.get_account_balance()
-        # print(res)
-        return res['data'][0]['details']
+            r = self.accaunt.get_account_balance()
+        res = r['data'][0]['details']
+        bal_usd = float(res[0]['eqUsd'])
+        price_cur_usd = bal_usd / float(res[0]['cashBal'])
+
+        return price_cur_usd, bal_usd
 
     # TRADE
     def place_order(self, data):
@@ -304,20 +307,20 @@ class Bot:
 
     def buy_order(self, inf: dict, price: float) -> dict:
         # Проверяем баланс для покупки
-        balance = OKXex().get_balance(inf['quote_cur'])[0]['availBal']
-        if float(balance) < conf.sz_quote:
-            print(balance)
-
+        price_cur_usd, bal_usd = OKXex().get_balance(inf['quote_cur'])
+        if float(bal_usd) < conf.sz_quote:
             Bot().debug('error', f'Недостаточно {inf["quote_cur"]} для выставления ордера')
         else:
-            size = conf.sz_quote / price
-            size = Bot().leveling(size=size, lotsize=inf['lotsize'])
+            size = conf.sz_quote / price_cur_usd
+            size = Bot().leveling(size=size, lotsize=inf['tick_size'])
+            # size = conf.sz_quote / price
+            # size = Bot().leveling(size=size, lotsize=inf['lotsize'])
             data = {
                 'instId': inf['symbol'],
                 'tdMode': 'cash',
                 'side': 'buy',
                 'ordType': 'market',
-                'tgtCcy': 'base_ccy',
+                'tgtCcy': 'quote_ccy',  # base_ccy
                 'sz': size,
             }
             order_id = OKXex().place_order(data=data)
@@ -381,3 +384,4 @@ class Bot:
                 inf = Bot().buy_order(inf=inf, price=float(df.Close.iloc[-1]))
 
         return inf
+
