@@ -1,5 +1,7 @@
 
 import json
+import time
+
 import okx.MarketData as Market
 from okx import Account, MarketData, PublicData, Trade
 import pandas as pd
@@ -107,16 +109,22 @@ class OKXex:
 
     # ACCAUNT
     # Получаем баланс
-    def get_balance(self, currency: str = None):
-        if currency:
-            r = self.accaunt.get_account_balance(ccy=currency)
-        else:
-            r = self.accaunt.get_account_balance()
-        res = r['data'][0]['details']
-        bal_usd = float(res[0]['eqUsd'])
-        price_cur_usd = bal_usd / float(res[0]['cashBal'])
+    def get_balance(self, currency: str):
+        res = self.accaunt.get_account_balance(ccy=currency)['data'][0]['details'][0]
+        return res
 
-        return price_cur_usd, bal_usd
+
+    # def get_balance(self, currency: str = None):
+    #     if currency:
+    #         r = self.accaunt.get_account_balance(ccy=currency)
+    #     else:
+    #         r = self.accaunt.get_account_balance()
+    #     # print(r)
+    #     res = r['data'][0]['details']
+    #     bal_usd = float(res[0]['eqUsd'])
+    #     price_cur_usd = bal_usd / float(res[0]['cashBal'])
+    #
+    #     return price_cur_usd, bal_usd
 
     # TRADE
     def place_order(self, data):
@@ -305,12 +313,19 @@ class Bot:
         size = size.quantize(Decimal(lotsize), ROUND_FLOOR)
         return str(size)
 
+    def get_balance(self, currency: str):
+        res = OKXex().get_balance(currency=currency)
+        cash = res['cashBal']  # какое к-во монет на счету
+        cash_in_usd = res['eqUsd']  # примерная стоимость монет на счету в доларах
+        return cash, cash_in_usd
+
     def buy_order(self, inf: dict, price: float) -> dict:
         # Проверяем баланс для покупки
-        price_cur_usd, bal_usd = OKXex().get_balance(inf['quote_cur'])
-        if float(bal_usd) < conf.sz_quote:
+        cash, cash_in_usd = Bot().get_balance(inf['quote_cur'])
+        if float(cash_in_usd) < conf.sz_quote:
             Bot().debug('error', f'Недостаточно {inf["quote_cur"]} для выставления ордера')
         else:
+            price_cur_usd = float(cash_in_usd) / float(cash)
             size = conf.sz_quote / price_cur_usd
             size = Bot().leveling(size=size, lotsize=inf['tick_size'])
             # size = conf.sz_quote / price
@@ -337,11 +352,12 @@ class Bot:
 
     def sell_order(self, inf: dict):
         # Проверяем баланс для продажи
-        balance = OKXex().get_balance(inf['base_cur'])[0]['availBal']
-        if len(inf['orders']) > 1 and float(balance) > 0:
+        cash, cash_in_usd = Bot().get_balance(inf['base_cur'])  # [0]['availBal']
+        # Если на закуп было выставлено более одного ордера и баланс в монете больше 0
+        if len(inf['orders']) and float(cash) > 0:
             size = float(inf['orders'][-1]['size'])
         else:
-            size = float(balance)
+            size = cash
         size = Bot().leveling(size=size, lotsize=inf['lotsize'])
         data = {
             'instId': inf['symbol'],
