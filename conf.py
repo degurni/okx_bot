@@ -82,7 +82,8 @@ steps = [(100 + step_percent) * 0.01, (100 - step_percent) * 0.01]
 less_percent = 10  # %
 less = 1 - (less_percent / 10000)
 
-symbols = ['AVAX-USDT', 'FIL-USDT', 'MATIC-USDT', 'XRP-USDT', 'DYDX-USDT', 'LUNC-USDT',]
+symbols = ['AVAX-USDT', 'FIL-USDT', 'MATIC-USDT', 'XRP-USDT', 'DYDX-USDT',
+           'LUNC-USDT', 'DOT-BTC']
 
 sz_quote = 4  # Размер ордера на закуп в USD
 tf = '15m'
