@@ -25,18 +25,18 @@ def trades_bot():
 def main():
     start()
     while True:
-        trades_bot()
-        time.sleep(conf.sleep_1)
-        # try:
-        #     trades_bot()
-        #     time.sleep(conf.sleep_1)
-        # except Exception as e:
-        #     print(e)
-        #     time.sleep(conf.sleep_1)
-        #     main()
-        # except KeyboardInterrupt:
-        #     Bot().debug('debug', 'Бот остановлен вручную')
-        #     sys.exit(0)
+        # trades_bot()
+        # time.sleep(conf.sleep_1)
+        try:
+            trades_bot()
+            time.sleep(conf.sleep_1)
+        except Exception as e:
+            print(e)
+            time.sleep(conf.sleep_1)
+            main()
+        except KeyboardInterrupt:
+            Bot().debug('debug', 'Бот остановлен вручную')
+            sys.exit(0)
 
 
 
