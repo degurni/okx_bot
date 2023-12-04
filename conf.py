@@ -2,6 +2,7 @@
 # pip install python-okx
 # pip install pandas
 # pip install pandas-ta
+# pip install pywin32
 
 key = '37183f91-bb5e-43c7-ab98-979474209be9'
 secret = '5AD20C1E094508003865FAA2B1B18E8D'
@@ -72,6 +73,7 @@ SPOT:
         OKDOT2-DOT
 """
 
+auto_reboot = False  # False - показывает ошибки, True - автоматически перезапускается
 debug = 'debug'
 
 # Сколько минимально процентов между ступеньками лестницы

@@ -107,24 +107,20 @@ class OKXex:
         else:
             return res['msg']
 
+    def get_time(self):
+        return OKXex().public.get_system_time()
+
     # ACCAUNT
     # Получаем баланс
     def get_balance(self, currency: str):
-        res = self.accaunt.get_account_balance(ccy=currency)['data'][0]['details'][0]
-        return res
-
-
-    # def get_balance(self, currency: str = None):
-    #     if currency:
-    #         r = self.accaunt.get_account_balance(ccy=currency)
-    #     else:
-    #         r = self.accaunt.get_account_balance()
-    #     # print(r)
-    #     res = r['data'][0]['details']
-    #     bal_usd = float(res[0]['eqUsd'])
-    #     price_cur_usd = bal_usd / float(res[0]['cashBal'])
-    #
-    #     return price_cur_usd, bal_usd
+        res = self.accaunt.get_account_balance(ccy=currency)
+        if res['msg'] == 'Timestamp request expired':
+            print(res)
+            time.sleep(conf.sleep_3)
+            OKXex().get_balance(currency=currency)
+        else:
+            # print(res)
+            return res['data'][0]['details'][0]
 
     # TRADE
     def place_order(self, data):
@@ -188,12 +184,16 @@ class OKXex:
                   'uTime': '1700040545927'}
 
         """
+        print(ord_id)
         return self.trade.get_order(instId=symbol, ordId=ord_id)['data'][0]
 
 class Bot:
 
     def _time(self):
         return datetime.datetime.now().strftime('%H:%M:%S')
+
+    def system_time(self):
+        pass
 
     def debug(self, var: str, inf: str) -> None:
         time = Bot()._time() if var == 'debug' else None
@@ -353,28 +353,31 @@ class Bot:
     def sell_order(self, inf: dict):
         # Проверяем баланс для продажи
         cash, cash_in_usd = Bot().get_balance(inf['base_cur'])  # [0]['availBal']
-        # Если на закуп было выставлено более одного ордера и баланс в монете больше 0
-        if len(inf['orders']) and float(cash) > 0:
-            size = float(inf['orders'][-1]['size'])
+        print(f'кеш на продажу - {cash}')
+        # Если баланс монеты больше чем куплено в последнем ордере и ордеров больше одного
+        if float(cash) > float(inf['orders'][-1]['size']) and len(inf['orders']) > 1:
+            cash = float(inf['orders'][-1]['size'])
+
+        size = Bot().leveling(size=cash, lotsize=inf['lotsize'])
+        if float(size) > float(inf['min_size']):
+            data = {
+                'instId': inf['symbol'],
+                'tdMode': 'cash',
+                'side': 'sell',
+                'ordType': 'market',
+                'tgtCcy': 'base_ccy',
+                'sz': size,
+            }
+            order_id = OKXex().place_order(data=data)
+            order_inf = OKXex().order_details(symbol=inf['symbol'], ord_id=order_id)
+            if order_inf['state'] == 'filled':
+                Bot().debug('error', f'Продано {order_inf["accFillSz"]} {inf["base_cur"]} по цене '
+                                     f'{order_inf["avgPx"]} {inf["quote_cur"]}')
+                if len(inf['orders']) > 1:
+                    inf['orders'][-2]['price'] = str(float(inf['orders'][-2]['price']) * conf.less)
         else:
-            size = cash
-        size = Bot().leveling(size=size, lotsize=inf['lotsize'])
-        data = {
-            'instId': inf['symbol'],
-            'tdMode': 'cash',
-            'side': 'sell',
-            'ordType': 'market',
-            'tgtCcy': 'base_ccy',
-            'sz': size,
-        }
-        order_id = OKXex().place_order(data=data)
-        order_inf = OKXex().order_details(symbol=inf['symbol'], ord_id=order_id)
-        if order_inf['state'] == 'filled':
-            Bot().debug('error', f'Продано {order_inf["accFillSz"]} {inf["base_cur"]} по цене '
-                                 f'{order_inf["avgPx"]} {inf["quote_cur"]}')
-            if len(inf['orders']) > 1:
-                inf['orders'][-2]['price'] = str(float(inf['orders'][-2]['price']) * conf.less)
-            inf['orders'].pop()
+            Bot().debug('debug', f'Остаток {inf["base_cur"]} меньше мин. для ордера')
+        inf['orders'].pop()
         return inf
 
     def zero_orders(self, inf: dict) -> dict:
