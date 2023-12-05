@@ -377,6 +377,7 @@ class Bot:
                     inf['orders'][-2]['price'] = str(float(inf['orders'][-2]['price']) * conf.less)
             inf['orders'].pop()
         else:
+            # Если кол-ва монеты на продажу не достаточно - очищаем список ордеров
             Bot().debug('debug', f'Остаток {inf["base_cur"]} меньше мин. для ордера')
             inf['oorders'] = []
         return inf
