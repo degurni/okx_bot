@@ -184,7 +184,7 @@ class OKXex:
                   'uTime': '1700040545927'}
 
         """
-        print(ord_id)
+        # print(ord_id)
         return self.trade.get_order(instId=symbol, ordId=ord_id)['data'][0]
 
 class Bot:
@@ -375,9 +375,10 @@ class Bot:
                                      f'{order_inf["avgPx"]} {inf["quote_cur"]}')
                 if len(inf['orders']) > 1:
                     inf['orders'][-2]['price'] = str(float(inf['orders'][-2]['price']) * conf.less)
+            inf['orders'].pop()
         else:
             Bot().debug('debug', f'Остаток {inf["base_cur"]} меньше мин. для ордера')
-        inf['orders'].pop()
+            inf['oorders'] = []
         return inf
 
     def zero_orders(self, inf: dict) -> dict:
