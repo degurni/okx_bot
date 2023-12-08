@@ -87,7 +87,7 @@ less = 1 - (less_percent / 10000)
 symbols = ['AVAX-USDT', 'FIL-USDT', 'MATIC-USDT', 'XRP-USDT', 'DYDX-USDT',
            'LUNC-USDT', 'DOT-BTC']
 
-sz_quote = 4  # Размер ордера на закуп в USD
+sz_quote = 4.2  # Размер ордера на закуп в USD
 tf = '15m'
 
 sleep_1 = 60

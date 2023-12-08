@@ -353,7 +353,7 @@ class Bot:
     def sell_order(self, inf: dict):
         # Проверяем баланс для продажи
         cash, cash_in_usd = Bot().get_balance(inf['base_cur'])  # [0]['availBal']
-        print(f'кеш на продажу - {cash}')
+        # print(f'кеш на продажу - {cash}')
         # Если баланс монеты больше чем куплено в последнем ордере и ордеров больше одного
         if float(cash) > float(inf['orders'][-1]['size']) and len(inf['orders']) > 1:
             cash = float(inf['orders'][-1]['size'])
@@ -380,6 +380,7 @@ class Bot:
             # Если кол-ва монеты на продажу не достаточно - очищаем список ордеров
             Bot().debug('debug', f'Остаток {inf["base_cur"]} меньше мин. для ордера')
             inf['oorders'] = []
+        print(inf)
         return inf
 
     def zero_orders(self, inf: dict) -> dict:
@@ -403,6 +404,5 @@ class Bot:
                     df.SIG.iloc[-1] == 'buy':
                 Bot().debug('debug', f'{inf["symbol"]}: Выставляем маркет ордер на покупку')
                 inf = Bot().buy_order(inf=inf, price=float(df.Close.iloc[-1]))
-
         return inf
 

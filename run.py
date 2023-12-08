@@ -16,6 +16,7 @@ def trades_bot():
         for inf in infa:
             if symbol == inf['symbol']:
                 inf = Bot().zero_orders(inf=inf)
+
     with open('trades.json', 'w') as f:
         json.dump(infa, f, indent=2)
 
