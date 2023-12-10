@@ -379,8 +379,8 @@ class Bot:
         else:
             # Если кол-ва монеты на продажу не достаточно - очищаем список ордеров
             Bot().debug('debug', f'Остаток {inf["base_cur"]} меньше мин. для ордера')
-            inf['oorders'] = []
-        print(inf)
+            inf['orders'] = []
+        # print(inf)
         return inf
 
     def zero_orders(self, inf: dict) -> dict:
