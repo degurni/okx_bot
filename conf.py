@@ -84,8 +84,8 @@ steps = [(100 + step_percent) * 0.01, (100 - step_percent) * 0.01]
 less_percent = 10  # %
 less = 1 - (less_percent / 10000)
 
-symbols = ['AVAX-USDT', 'FIL-USDT', 'MATIC-USDT', 'XRP-USDT', 'DYDX-USDT',
-           'LUNC-USDT', 'DOT-BTC']
+symbols = [ 'FIL-USDT', 'MATIC-USDT', 'XRP-USDT', 'DYDX-USDT',  #'AVAX-USDT',
+           'LUNC-USDT', 'DOT-BTC', 'KSM-USDT']
 
 sz_quote = 4.2  # Размер ордера на закуп в USD
 tf = '15m'
@@ -94,3 +94,10 @@ sleep_1 = 60
 sleep_2 = 30
 sleep_3 = 10
 sleep_4 = 5
+
+# ========================================
+obs_bal_tf = 15  # Тайм-фрейм наблюдений за балансом (один раз в 15 минут)
+obs_len = 288  # 3 дня Максимальная длинна собираемых данных о балансе <balance.json>
+obs_lenght_sma = 3  # Сглаживание графика баланса
+
+# ========================================

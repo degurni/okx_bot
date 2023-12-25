@@ -12,6 +12,9 @@ def start():
 def trades_bot():
     with open('trades.json', 'r') as f:
         infa = json.loads(f.read())
+
+    Bot().obs_balance()
+
     for symbol in conf.symbols:
         for inf in infa:
             if symbol == inf['symbol']:

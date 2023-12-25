@@ -9,6 +9,7 @@ import pandas_ta as ta
 from decimal import Decimal, ROUND_FLOOR
 import math
 import datetime
+import time
 import os
 
 import conf
@@ -121,6 +122,11 @@ class OKXex:
         else:
             # print(res)
             return res['data'][0]['details'][0]
+
+    def get_bal(self):
+        res = self.accaunt.get_account_balance()
+        if res['code'] == '0':
+            return res['data'][0]['details']
 
     # TRADE
     def place_order(self, data):
@@ -405,4 +411,42 @@ class Bot:
                 Bot().debug('debug', f'{inf["symbol"]}: Выставляем маркет ордер на покупку')
                 inf = Bot().buy_order(inf=inf, price=float(df.Close.iloc[-1]))
         return inf
+
+    def obs_balance(self):
+        tm = int(round(time.time()))
+        if not os.path.isfile('balance.json'):
+            infa = []
+            all_bal = OKXex().get_bal()
+            balance = 0
+            for i in all_bal:
+                balance += float(i['eqUsd'])
+            res = {
+                'time': tm,
+                'balance': round(balance, 2)
+            }
+            infa.append(res)
+        else:
+            with open('balance.json', 'r') as f:
+                infa = json.loads(f.read())
+            if int(infa[-1]['time']) + (conf.obs_bal_tf * 60) <= tm:
+                all_bal = OKXex().get_bal()
+                balance = 0
+                for i in all_bal:
+                    balance += float(i['eqUsd'])
+                res = {
+                    'time': tm,
+                    'balance': round(balance, 2)
+                }
+                infa.append(res)
+        infa = infa[-1 * conf.obs_len:]
+        with open('balance.json', 'w') as f:
+            json.dump(infa, f, indent=2)
+
+        df = pd.read_json('balance.json')
+        df['sma'] = ta.sma(close=df.balance, length=conf.obs_lenght_sma)
+
+
+        if df.sma.max() < df.sma.iloc[-2] > df.sma.iloc[-1]:
+            Bot().debug('debug', 'Баланс на пике - срочно продай что нибудь')
+
 
