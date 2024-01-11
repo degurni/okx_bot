@@ -446,7 +446,7 @@ class Bot:
         df['sma'] = ta.sma(close=df.balance, length=conf.obs_lenght_sma)
 
 
-        if df.sma.max() < df.sma.iloc[-2] > df.sma.iloc[-1]:
+        if df.sma.max() * conf.obs_percent < df.sma.iloc[-2] > df.sma.iloc[-1]:
             Bot().debug('debug', 'Баланс на пике - срочно продай что нибудь')
 
 
